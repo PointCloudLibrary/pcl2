@@ -37,6 +37,9 @@
 #ifndef PCL_GPU_CONTAINERS_DEVICE_MEMORY_HPP_
 #define PCL_GPU_CONTAINERS_DEVICE_MEMORY_HPP_
 
+#include "pcl/pcl_macros.h"
+#include <pcl/gpu/containers/kernel_containers.hpp>
+
 namespace pcl
 {
     namespace gpu
@@ -70,7 +73,7 @@ namespace pcl
             DeviceMemory(void *ptr_arg, size_t sizeBytes_arg);
 
             /** \brief Copy constructor. Just increments reference counter. */
-            DeviceMemory(const DeviceArray& other_arg);
+            DeviceMemory(const DeviceMemory& other_arg);
 
             /** \brief Assigment operator. Just increments reference counter. */
             DeviceMemory& operator=(const DeviceMemory& other_arg);
@@ -95,22 +98,22 @@ namespace pcl
             void download(void *host_ptr_arg) const;
             
             /** \brief Returns pointer for internal buffer in GPU memory. */
-            template<class T>       T* ptr()       { return (      T*)data_; }
+            template<class T> T* ptr();
 
             /** \brief Returns constant pointer for internal buffer in GPU memory. */            
-            template<class T> const T* ptr() const { return (const T*)data_; }
+            template<class T> const T* ptr() const;
+
+            /** \brief Conversion to PtrSz for passing to kernel functions. */
+            template <class U> operator PtrSz<U>() const;            
            
             /** \brief Device pointer. */
             char *data;
 
-            /** \brief Allocated size. */
-            size_t size;
+            /** \brief Allocated size in bytes. */
+            size_t sizeBytes;
 
             /** \brief Pointer to reference counter in CPU memory. */
-            int* refcount;
-
-            /** \brief Conversion to PtrSz for passing to kernel functions. */
-            template <class U> operator PtrSz<U>() const;            
+            int* refcount;            
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,7 +146,7 @@ namespace pcl
               * \param data_arg: pointer to buffer
               * \param stepBytes_arg: stride between two consecutive rows in bytes
               * */
-            DeviceMemory2D(int rows_arg, int colsBytes_arg, void *data_arg, size_t stepBytes_arg);
+            DeviceMemory2D(int rows_arg, int colsBytes_arg, void *data_arg, size_t step_arg);
 
             /** \brief Copy constructor. Just increments reference counter. */
             DeviceMemory2D(const DeviceMemory2D& other_arg);
@@ -177,12 +180,12 @@ namespace pcl
             /** \brief Returns pointer to given row in internal buffer. 
               * \param y_arg: row index   
               * */
-            template<class T>       T* ptr(int y_arg = 0)       { return (      T*)(data_ + y * step_); }
+            template<class T> T* ptr(int y_arg = 0);
 
             /** \brief Returns constant pointer to given row in internal buffer. 
               * \param y_arg: row index   
               * */
-            template<class T> const T* ptr(int y_arg = 0) const { return (const T*)(data_ + y * step_); }            
+            template<class T> const T* ptr(int y_arg = 0) const;
 
              /** \brief Conversion to PtrStep for passing to kernel functions. */
             template <class U> operator PtrStep<U>() const;            
@@ -208,5 +211,6 @@ namespace pcl
     }
 }
 
+#include "pcl/gpu/containers/impl/device_memory_impl.hpp"
 
 #endif /* PCL_GPU_CONTAINERS_DEVICE_MEMORY_HPP_ */

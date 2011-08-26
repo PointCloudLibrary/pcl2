@@ -34,56 +34,28 @@
  *  Author: Anatoly Baskeheev, Itseez Ltd, (myname.mysurname@mycompany.com)
  */
 
+#ifndef PCL_GPU_SCOPE_TIMER_CV_H
+#define PCL_GPU_SCOPE_TIMER_CV_H
 
-#ifndef PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
-#define PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
-
-
-#if defined(__CUDACC__) 
-    #define __PCL_GPU_HOST_DEVICE__ __host__ __device__ __forceinline__ 
-#else
-    #define __PCL_GPU_HOST_DEVICE__
-#endif  
-
+#include <opencv2/contrib/contrib.hpp>
+#include <iostream>
 
 namespace pcl
 {
     namespace gpu
     {
-        template<typename T> struct DevPtr
+        struct ScopeTimerCV
         {
-            typedef T elem_type;
-            const static size_t elem_size = sizeof(elem_type);
-
-            T* data;
-
-            __PCL_GPU_HOST_DEVICE__ size_t elemSize() const { return elem_size; }
-            __PCL_GPU_HOST_DEVICE__ operator T*() const { return data; }
-        };
-
-        template<typename T> struct PtrSz : public DevPtr<T>
-        {                     
-            size_t size;
-        };
-
-        template<typename T>  struct PtrStep : public DevPtr<T>
-        {            
-            /** \brief stride between two consecutive rows in bytes. Step is stored always and everywhere in bytes!!! */
-            size_t step;            
-
-            __PCL_GPU_HOST_DEVICE__       T* ptr(int y = 0)       { return (      T*)( (      char*)data + y * step); }
-            __PCL_GPU_HOST_DEVICE__ const T* ptr(int y = 0) const { return (const T*)( (const char*)data + y * step); }            
-        };
-
-        template <typename T> struct PtrStepSz : public PtrStep<T>
-        {               
-            int cols;
-            int rows;                                                                              
+            const char* name;
+            cv::TickMeter tm;
+            ScopeTimerCV(const char *name_) : name(name_) { tm.start(); }
+            ~ScopeTimerCV() 
+            {
+                tm.stop();
+                std::cout << "Time(" << name << ") = " << tm.getTimeMilli() << "ms" << std::endl;        
+            }
         };
     }
 }
 
-#undef __PCL_GPU_HOST_DEVICE__
-
-#endif /* PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_ */
-
+#endif PCL_GPU_SCOPE_TIMER_CV_H

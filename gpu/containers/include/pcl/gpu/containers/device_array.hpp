@@ -38,7 +38,6 @@
 #define PCL_GPU_CONTAINER_DEVICE_ARRAY_HPP_
 
 #include <pcl/gpu/containers/device_memory.hpp>
-#include <pcl/gpu/containers/kernel_containers.hpp>
 
 #include <vector>
 
@@ -57,7 +56,7 @@ namespace pcl
             enum { elem_size = sizeof(T) };
 
             DeviceArray();
-            DeviceArrDeviceArrayay_(size_t size);
+            DeviceArray(size_t size);
             DeviceArray(T *ptr, size_t size);
 
             DeviceArray(const DeviceArray& other);
@@ -76,9 +75,7 @@ namespace pcl
             const T* ptr() const;
 
             //using DeviceMemory::ptr;
-            template<class U> U* ptr() { return (U*)ptr(); }
-            template<class U> const U* ptr() const { return (const U*)ptr(); }
-
+            
             operator T*();
             operator const T*() const;
 
@@ -111,21 +108,22 @@ namespace pcl
             void upload(const std::vector<T>& data, int cols);
             void download(std::vector<T>& data, int& cols) const;
                                           
-            T* ptr(int y = 0); 
+            T* ptr(int y = 0);             
             const T* ptr(int y = 0) const;            
+            
+            //using DeviceMemory2D::ptr;            
 
             operator T*();
-            operator const T*() const;
-
-            //using DeviceMemory2D::ptr;            
-            template <class U> operator PtrStep<U>() const;            
-            template <class U> operator PtrStepSz<U>() const;
+            operator const T*() const;                        
             
             int cols() const;
             int rows() const;
+
+            int elem_step() const;
         };        
     }
 }
 
+#include "pcl/gpu/containers/impl/device_array_impl.hpp"
 
 #endif /* PCL_GPU_CONTAINER_DEVICE_ARRAY_HPP_ */

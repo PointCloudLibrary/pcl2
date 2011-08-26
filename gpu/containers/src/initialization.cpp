@@ -1,4 +1,4 @@
-/*
+ /*
  * Software License Agreement (BSD License)
  *
  *  Copyright (c) 2011, Willow Garage, Inc.
@@ -34,56 +34,47 @@
  *  Author: Anatoly Baskeheev, Itseez Ltd, (myname.mysurname@mycompany.com)
  */
 
+#include "pcl/gpu/containers/initialization.hpp"
+#include "cuda_runtime_api.h"
 
-#ifndef PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
-#define PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
+//temporary dependence, should eliminated in future
+//Replace with THROW_PCL_EXCEPTION from PCL2.0 API
+#include "pcl/gpu/common/safe_call.hpp"
 
 
-#if defined(__CUDACC__) 
-    #define __PCL_GPU_HOST_DEVICE__ __host__ __device__ __forceinline__ 
+
+#define HAVE_CUDA
+//#include "pcl_config.h"
+
+
+#if !defined(HAVE_CUDA)
+
+void throw_nogpu() { throw "PCL 2.0 exception"; }
+int  pcl::gpu::getCudaEnabledDeviceCount() { return 0; }
+void pcl::gpu::setDevice(int device) { throw_nogpu(); }
+
 #else
-    #define __PCL_GPU_HOST_DEVICE__
-#endif  
 
 
-namespace pcl
+int pcl::gpu::getCudaEnabledDeviceCount()
 {
-    namespace gpu
-    {
-        template<typename T> struct DevPtr
-        {
-            typedef T elem_type;
-            const static size_t elem_size = sizeof(elem_type);
+    int count;
+    cudaError_t error = cudaGetDeviceCount( &count );
 
-            T* data;
+    if (error == cudaErrorInsufficientDriver)
+        return -1;
 
-            __PCL_GPU_HOST_DEVICE__ size_t elemSize() const { return elem_size; }
-            __PCL_GPU_HOST_DEVICE__ operator T*() const { return data; }
-        };
+    if (error == cudaErrorNoDevice)
+        return 0;
 
-        template<typename T> struct PtrSz : public DevPtr<T>
-        {                     
-            size_t size;
-        };
-
-        template<typename T>  struct PtrStep : public DevPtr<T>
-        {            
-            /** \brief stride between two consecutive rows in bytes. Step is stored always and everywhere in bytes!!! */
-            size_t step;            
-
-            __PCL_GPU_HOST_DEVICE__       T* ptr(int y = 0)       { return (      T*)( (      char*)data + y * step); }
-            __PCL_GPU_HOST_DEVICE__ const T* ptr(int y = 0) const { return (const T*)( (const char*)data + y * step); }            
-        };
-
-        template <typename T> struct PtrStepSz : public PtrStep<T>
-        {               
-            int cols;
-            int rows;                                                                              
-        };
-    }
+    cudaSafeCall(error);
+    return count;  
 }
 
-#undef __PCL_GPU_HOST_DEVICE__
+void pcl::gpu::setDevice(int device)
+{
+    cudaSafeCall( cudaSetDevice( device ) );
+}
 
-#endif /* PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_ */
 
+#endif

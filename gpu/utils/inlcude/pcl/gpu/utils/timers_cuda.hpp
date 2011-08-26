@@ -34,56 +34,65 @@
  *  Author: Anatoly Baskeheev, Itseez Ltd, (myname.mysurname@mycompany.com)
  */
 
+#ifndef _PCL_CUDA_TIMERS_HPP_
+#define _PCL_CUDA_TIMERS_HPP_
 
-#ifndef PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
-#define PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
-
-
-#if defined(__CUDACC__) 
-    #define __PCL_GPU_HOST_DEVICE__ __host__ __device__ __forceinline__ 
-#else
-    #define __PCL_GPU_HOST_DEVICE__
-#endif  
-
+#include <cuda_runtime_api.h>
+#include <cstdio>
 
 namespace pcl
 {
-    namespace gpu
+    namespace cuda
     {
-        template<typename T> struct DevPtr
+        struct Timer
         {
-            typedef T elem_type;
-            const static size_t elem_size = sizeof(elem_type);
+            cudaEvent_t start_, stop_;
+            Timer(bool runTimer = false) 
+            { 
+                cudaEventCreate(&start_); 
+                cudaEventCreate(&stop_);  
+                if (runTimer)
+                    start();
+            }
+            ~Timer() 
+            { 
+                cudaEventDestroy(start_);  
+                cudaEventDestroy(stop_);
+            }
 
-            T* data;
+            void start() { cudaEventRecord(start_, 0); }
+            Timer& stop()  { cudaEventRecord(stop_, 0); cudaEventSynchronize(stop_); return *this; }
 
-            __PCL_GPU_HOST_DEVICE__ size_t elemSize() const { return elem_size; }
-            __PCL_GPU_HOST_DEVICE__ operator T*() const { return data; }
+            float time()
+            {
+                float elapsed_time; 
+                cudaEventElapsedTime(&elapsed_time, start_, stop_);
+                return elapsed_time;
+            }
         };
 
-        template<typename T> struct PtrSz : public DevPtr<T>
-        {                     
-            size_t size;
-        };
-
-        template<typename T>  struct PtrStep : public DevPtr<T>
-        {            
-            /** \brief stride between two consecutive rows in bytes. Step is stored always and everywhere in bytes!!! */
-            size_t step;            
-
-            __PCL_GPU_HOST_DEVICE__       T* ptr(int y = 0)       { return (      T*)( (      char*)data + y * step); }
-            __PCL_GPU_HOST_DEVICE__ const T* ptr(int y = 0) const { return (const T*)( (const char*)data + y * step); }            
-        };
-
-        template <typename T> struct PtrStepSz : public PtrStep<T>
-        {               
-            int cols;
-            int rows;                                                                              
+        struct ScopeTimer
+        {
+            const char* name;
+            cudaEvent_t start, stop;
+            ScopeTimer(const char* name_) : name(name_)
+            {
+                cudaEventCreate(&start); 
+                cudaEventCreate(&stop);  
+                cudaEventRecord(start);
+            }
+            ~ScopeTimer()
+            {
+                float elapsed_time; 
+                cudaEventRecord(stop);	
+                cudaEventSynchronize(stop);
+                cudaEventElapsedTime(&elapsed_time, start, stop);
+                printf("Time(%s) = %fms\n", name, elapsed_time);        
+                cudaEventDestroy(start);  
+                cudaEventDestroy(stop);
+            }
         };
     }
 }
 
-#undef __PCL_GPU_HOST_DEVICE__
-
-#endif /* PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_ */
-
+#endif /* _PCL_CUDA_TIMERS_HPP_ */

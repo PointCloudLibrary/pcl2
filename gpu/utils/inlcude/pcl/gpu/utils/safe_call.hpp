@@ -34,56 +34,31 @@
  *  Author: Anatoly Baskeheev, Itseez Ltd, (myname.mysurname@mycompany.com)
  */
 
+#ifndef __PCL_CUDA_SAFE_CALL_HPP__
+#define __PCL_CUDA_SAFE_CALL_HPP__
 
-#ifndef PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
-#define PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_
+#include "cuda_runtime_api.h"
+#include "pcl/pcl_macros.h"
 
-
-#if defined(__CUDACC__) 
-    #define __PCL_GPU_HOST_DEVICE__ __host__ __device__ __forceinline__ 
-#else
-    #define __PCL_GPU_HOST_DEVICE__
-#endif  
-
+#if defined(__GNUC__)
+    #define cudaSafeCall(expr)  pcl::cuda::___cudaSafeCall(expr, __FILE__, __LINE__, __func__)
+#else /* defined(__CUDACC__) || defined(__MSVC__) */
+    #define cudaSafeCall(expr)  pcl::cuda::___cudaSafeCall(expr, __FILE__, __LINE__)    
+#endif
 
 namespace pcl
 {
-    namespace gpu
+    namespace cuda
     {
-        template<typename T> struct DevPtr
+        void PCL_EXPORTS error(const char *error_string, const char *file, const int line, const char *func = "");
+
+        static inline void ___cudaSafeCall(cudaError_t err, const char *file, const int line, const char *func = "")
         {
-            typedef T elem_type;
-            const static size_t elem_size = sizeof(elem_type);
-
-            T* data;
-
-            __PCL_GPU_HOST_DEVICE__ size_t elemSize() const { return elem_size; }
-            __PCL_GPU_HOST_DEVICE__ operator T*() const { return data; }
-        };
-
-        template<typename T> struct PtrSz : public DevPtr<T>
-        {                     
-            size_t size;
-        };
-
-        template<typename T>  struct PtrStep : public DevPtr<T>
-        {            
-            /** \brief stride between two consecutive rows in bytes. Step is stored always and everywhere in bytes!!! */
-            size_t step;            
-
-            __PCL_GPU_HOST_DEVICE__       T* ptr(int y = 0)       { return (      T*)( (      char*)data + y * step); }
-            __PCL_GPU_HOST_DEVICE__ const T* ptr(int y = 0) const { return (const T*)( (const char*)data + y * step); }            
-        };
-
-        template <typename T> struct PtrStepSz : public PtrStep<T>
-        {               
-            int cols;
-            int rows;                                                                              
-        };
+            if (cudaSuccess != err)
+                error(cudaGetErrorString(err), file, line, func);
+        }
     }
 }
 
-#undef __PCL_GPU_HOST_DEVICE__
 
-#endif /* PCL_GPU_CONTAINERS_KERNEL_CONTAINERS_HPP_ */
-
+#endif /* __PCL_CUDA_SAFE_CALL_HPP__ */
