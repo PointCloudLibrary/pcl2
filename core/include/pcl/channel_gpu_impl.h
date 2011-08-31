@@ -82,8 +82,10 @@ namespace pcl
         virtual const char* getTypeName () const;
         
         /**
-        * @brief the actual data. BTW, DeviceArray supports reference counting.
+        * @brief the actual data. BTW, DeviceArray2D supports reference counting. 
+        * 2D-verion of DeviceArray to be able to store organized clouds.
         */
-        pcl::gpu::DeviceArray<Type> data_;
+        pcl::gpu::DeviceArray2D<Type> data_;
+       
     };
 }

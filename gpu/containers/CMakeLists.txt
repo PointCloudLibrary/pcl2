@@ -1,7 +1,7 @@
 set(SUBSYS_NAME gpu_containers)
 set(SUBSYS_PATH cuda/containers)
 set(SUBSYS_DESC "Containers with reference counting for GPU memory. This module can be compiled without Cuda Toolkit.")
-set(SUBSYS_DEPS common gpu_utils)
+set(SUBSYS_DEPS common)
 
 set(build TRUE)
 PCL_SUBSYS_OPTION(build ${SUBSYS_NAME} ${SUBSYS_DESC} ON)
@@ -21,7 +21,6 @@ if (build)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
     PCL_CUDA_ADD_LIBRARY(${LIB_NAME} ${SUBSYS_NAME} ${srcs} ${incs})
     PCL_ADD_SSE_FLAGS(${LIB_NAME})
-    target_link_libraries(${LIB_NAME} pcl_gpu_utils)
 
     set(EXT_DEPS "")
     #set(EXT_DEPS CUDA)
