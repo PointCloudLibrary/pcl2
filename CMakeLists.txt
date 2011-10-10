@@ -144,7 +144,7 @@ include(${PCL_SOURCE_DIR}/cmake/pcl_tests.cmake)
 ### ---[ Add the library subdirectories
 include(${PCL_SOURCE_DIR}/cmake/pcl_targets.cmake)
 add_subdirectory(core)
-add_subdirectory(io)
+#add_subdirectory(io)
 #add_subdirectory(filters)
 #add_subdirectory(visualization)
 #add_subdirectory(test)
