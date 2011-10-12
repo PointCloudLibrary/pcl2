@@ -50,35 +50,35 @@ class sseflt {
   }
 };
 
-sseflt operator&(const sseflt &a, const sseflt &b)
+static sseflt operator&(const sseflt &a, const sseflt &b)
 {
   return sseflt(_mm_and_ps(a.m128, b.m128));
 }
-sseflt operator^(const sseflt &a, const sseflt &b)
+static sseflt operator^(const sseflt &a, const sseflt &b)
 {
   return sseflt(_mm_xor_ps(a.m128, b.m128));
 }
-sseflt operator|(const sseflt &a, const sseflt &b)
+static sseflt operator|(const sseflt &a, const sseflt &b)
 {
   return sseflt(_mm_or_ps(a.m128, b.m128));
 }
 
-sseflt operator+(const sseflt &a, const sseflt &b)
+static sseflt operator+(const sseflt &a, const sseflt &b)
 {
   return sseflt(a.m128 + b.m128);
 }
 
-sseflt operator+(const sseflt &a, float f)
+static sseflt operator+(const sseflt &a, float f)
 {
   return a + sseflt(f);
 }
 
-sseflt operator*(const sseflt &a, const sseflt &b)
+static sseflt operator*(const sseflt &a, const sseflt &b)
 {
   return sseflt(a.m128 * b.m128);
 }
 
-sseflt operator/(float f, const sseflt &b)
+static sseflt operator/(float f, const sseflt &b)
 {
   sseflt a(f);
   return sseflt(a.m128 / b.m128);
@@ -123,22 +123,22 @@ class vanflt {
   vanbool equals(const vanflt &b)   { return vanbool(v == b.v); }
 };
 
-vanflt operator+(const vanflt &a, const vanflt &b)
+static vanflt operator+(const vanflt &a, const vanflt &b)
 {
   return vanflt(a.v + b.v);
 }
 
-vanflt operator+(const vanflt &a, float f)
+static vanflt operator+(const vanflt &a, float f)
 {
   return a + vanflt(f);
 }
 
-vanflt operator*(const vanflt &a, const vanflt &b)
+static vanflt operator*(const vanflt &a, const vanflt &b)
 {
   return vanflt(a.v * b.v);
 }
 
-vanflt operator/(float f, const vanflt &b)
+static vanflt operator/(float f, const vanflt &b)
 {
   vanflt a(f);
   return vanflt(a.v / b.v);
@@ -211,7 +211,7 @@ class xband : public kernel<TF> {
 //
 
 template <class kernel>
-float xyz_sum(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
+static float xyz_sum(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 {
   float total = 0.0;
   while (sz--)
@@ -220,7 +220,7 @@ float xyz_sum(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
-float xyz_sum2(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
+static float xyz_sum2(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 {
   float total = 0.0;
   while (sz--) {
@@ -231,7 +231,7 @@ float xyz_sum2(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
-int xyz_any(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
+static int xyz_any(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 {
   while (sz--)
     if (wk.work(*xi++, *yi++, *zi++).v)
@@ -240,7 +240,7 @@ int xyz_any(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
-int xyz_all(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
+static int xyz_all(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 {
   while (sz--)
     if (!wk.work(*xi++, *yi++, *zi++).v)
@@ -249,7 +249,7 @@ int xyz_all(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
-std::vector<size_t> xyz_pick(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
+static std::vector<size_t> xyz_pick(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 {
   std::vector<size_t> r;
   for (size_t i = 0; i < sz; i++)
@@ -259,7 +259,7 @@ std::vector<size_t> xyz_pick(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kern
 }
 
 template <class kernel>
-void xyz_xyz(vanflt *xo, vanflt *yo, vanflt *zo,
+static void xyz_xyz(vanflt *xo, vanflt *yo, vanflt *zo,
              vanflt *xi, vanflt *yi, vanflt *zi,
              size_t sz, kernel &wk)
 {
@@ -290,7 +290,7 @@ static ssebool bool_masks[4] = {
 
 
 template <class kernel>
-float xyz_sum(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
+static float xyz_sum(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 {
   sseflt total(0.0), t(0.0);
   size_t fours = ((sz + 3) >> 2);
@@ -304,7 +304,7 @@ float xyz_sum(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 
 // for a kernel that returns a scalar, return the sum of squares
 template <class kernel>
-float xyz_sum2(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
+static float xyz_sum2(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 {
   sseflt total(0.0), t(0.0);
   size_t fours = ((sz + 3) >> 2);
@@ -317,7 +317,7 @@ float xyz_sum2(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
-int xyz_any(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
+static int xyz_any(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 {
   ssebool t(0);
   size_t fours = ((sz + 3) >> 2);
@@ -330,7 +330,7 @@ int xyz_any(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
-int xyz_all(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
+static int xyz_all(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 {
   ssebool t(~0);
   size_t fours = ((sz + 3) >> 2);
@@ -358,7 +358,7 @@ static void push4(std::vector<size_t> &v, size_t i, int msk)   // Append i, i+1,
 }
 
 template <class kernel>
-std::vector<size_t> xyz_pick(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
+static std::vector<size_t> xyz_pick(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kernel &wk)
 {
   std::vector<size_t> r;
   ssebool t(0);
@@ -375,7 +375,7 @@ std::vector<size_t> xyz_pick(sseflt *xi, sseflt *yi, sseflt *zi, size_t sz, kern
 }
 
 template <class kernel>
-void xyz_xyz(sseflt *xo, sseflt *yo, sseflt *zo,
+static void xyz_xyz(sseflt *xo, sseflt *yo, sseflt *zo,
              sseflt *xi, sseflt *yi, sseflt *zi,
              size_t sz, kernel &wk)
 {
