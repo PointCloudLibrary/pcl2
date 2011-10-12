@@ -2,6 +2,7 @@
 #include "pcl2/cloud.h"
 #include "pcl2/float_array.h"
 #include "pcl2/int_array.h"
+#include "pcl2/kernels.h"
 
 using namespace std;
 
@@ -20,7 +21,19 @@ void printFloatArrayRow (const pcl2::FloatArray & array, size_t i)
   cout << endl;
 }
 
+typedef sse TURBO;
+typedef TURBO::tfloat TURBOf;
 
+float dot(const pcl2::FloatArray &a)
+{
+  const float *x = &a(0,0);
+  const float *y = &a(0,1);
+  const float *z = &a(0,2);
+
+  float m[3] = { 1, 0, 0 };
+  dot3<TURBO> wrk(m);
+  return xyz_sum((TURBOf*)x, (TURBOf*)y, (TURBOf*)z, a.rows(), wrk);
+}
 
 int main (int argc, char ** argv)
 {
@@ -55,6 +68,9 @@ int main (int argc, char ** argv)
     cout << "The " << (i+1) << "th row of pts: " 
          << pts (i,0) << ", " << pts (i, 1) << ", " << pts (i,2) << endl;
   }
+
+  // Run a simple kernel
+  cout << "dot " << dot(cloud["xyz"]) << endl;
 
   // Creating an IntArray and adding it to a cloud
   pcl2::IntArray::Ptr ia = pcl2::IntArray::create (100, 3);
