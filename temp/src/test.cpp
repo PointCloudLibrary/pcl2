@@ -21,8 +21,8 @@ void printFloatArrayRow (const pcl2::FloatArray & array, size_t i)
   cout << endl;
 }
 
-typedef sse TURBO;
-typedef TURBO::tfloat TURBOf;
+typedef sse BACKEND;
+typedef BACKEND::tfloat BACKENDf;
 
 float dot(const pcl2::FloatArray &a)
 {
@@ -31,8 +31,26 @@ float dot(const pcl2::FloatArray &a)
   const float *z = &a(0,2);
 
   float m[3] = { 1, 0, 0 };
-  dot3<TURBO> wrk(m);
-  return xyz_sum((TURBOf*)x, (TURBOf*)y, (TURBOf*)z, a.rows(), wrk);
+  dot3<BACKEND> dot3_k(m);
+  return xyz_sum((BACKENDf*)x, (BACKENDf*)y, (BACKENDf*)z, a.rows(), dot3_k);
+}
+
+pcl2::Cloud filter(const pcl2::Cloud &cl, string fieldname, float lo, float hi, bool negate)
+{
+  const pcl2::FloatArray &xyz = dynamic_cast<const pcl2::FloatArray&>(cl["xyz"]);
+  std::vector<size_t> viewed;
+  if (fieldname == "x") {
+    inrange_x<BACKEND> inrange_k(lo, hi, negate);
+    viewed = xyz_pick((BACKENDf*)&xyz(0,0), (BACKENDf*)&xyz(0,1), (BACKENDf*)&xyz(0,2), xyz.rows(), inrange_k);
+  }
+  if (fieldname == "y") {
+    inrange_y<BACKEND> inrange_k(lo, hi, negate);
+    viewed = xyz_pick((BACKENDf*)&xyz(0,0), (BACKENDf*)&xyz(0,1), (BACKENDf*)&xyz(0,2), xyz.rows(), inrange_k);
+  }
+  if (fieldname == "z") {
+    inrange_z<BACKEND> inrange_k(lo, hi, negate);
+    viewed = xyz_pick((BACKENDf*)&xyz(0,0), (BACKENDf*)&xyz(0,1), (BACKENDf*)&xyz(0,2), xyz.rows(), inrange_k);
+  }
 }
 
 int main (int argc, char ** argv)

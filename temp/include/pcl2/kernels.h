@@ -5,7 +5,7 @@
 //  SSE implementations: ssebool, ssefloat
 //
 
-#include <pmmintrin.h>
+#include <smmintrin.h>
 
 class ssebool {
   public:
@@ -84,10 +84,22 @@ static sseflt operator/(float f, const sseflt &b)
   return sseflt(a.m128 / b.m128);
 }
 
+typedef __m128i sseidx;
+
+static sseflt access(const sseflt *psf, sseidx i) {
+  const float *pf = (float*)psf;
+  uint32_t i0 = _mm_extract_epi32(i, 0);
+  uint32_t i1 = _mm_extract_epi32(i, 1);
+  uint32_t i2 = _mm_extract_epi32(i, 2);
+  uint32_t i3 = _mm_extract_epi32(i, 3);
+  return sseflt(_mm_set_ps(pf[i0], pf[i1], pf[i2], pf[i3]));
+}
+
 class sse {
   public:
     typedef sseflt tfloat;
     typedef ssebool tbool;
+    typedef sseidx tindex;
 };
 
 // ========================================================================
@@ -123,6 +135,8 @@ class vanflt {
   vanbool equals(const vanflt &b)   { return vanbool(v == b.v); }
 };
 
+typedef uint32_t vanidx;
+
 static vanflt operator+(const vanflt &a, const vanflt &b)
 {
   return vanflt(a.v + b.v);
@@ -148,10 +162,11 @@ class van {
   public:
     typedef vanflt tfloat;
     typedef vanbool tbool;
+    typedef vanidx tindex;
 };
 
 // ========================================================================
-// application kernels, templated on a type family, TF
+// kernels, templated on a type family, TF
 //
 
 template <class TF>
@@ -183,15 +198,44 @@ class dot3 : public kernel<TF> {
     }
 };
 
-template <class TF>
-class xband : public kernel<TF> {
+class inrange {
+  protected:
     float lo, hi;
+    bool negate;
+  public:
+    inrange(float _lo, float _hi, bool _negate) : lo(_lo), hi(_hi), negate(_negate) {}
+};
+
+template <class TF>
+class inrange_x : public inrange {
   public:
     typedef typename TF::tfloat mfloat;
     typedef typename TF::tbool mbool;
-    xband(float _lo, float _hi) { lo = _lo; hi = _hi; }
+    inrange_x(float _lo, float _hi, bool _negate) : inrange(_lo, _hi, _negate) {}
     mbool work(mfloat x, mfloat y, mfloat z) {
       return x.greaterthan(lo) & x.lessthan(hi);
+    }
+};
+
+template <class TF>
+class inrange_y : public inrange {
+  public:
+    typedef typename TF::tfloat mfloat;
+    typedef typename TF::tbool mbool;
+    inrange_y(float _lo, float _hi, bool _negate) : inrange(_lo, _hi, _negate) {}
+    mbool work(mfloat x, mfloat y, mfloat z) {
+      return y.greaterthan(lo) & y.lessthan(hi);
+    }
+};
+
+template <class TF>
+class inrange_z : public inrange {
+  public:
+    typedef typename TF::tfloat mfloat;
+    typedef typename TF::tbool mbool;
+    inrange_z(float _lo, float _hi, bool _negate) : inrange(_lo, _hi, _negate) {}
+    mbool work(mfloat x, mfloat y, mfloat z) {
+      return z.greaterthan(lo) & z.lessthan(hi);
     }
 };
 
@@ -204,7 +248,6 @@ class xband : public kernel<TF> {
 // xyz_min
 // xyz_max
 // xyz_xyz  for a kernel that transforms xyz, xyz_xyz transforms coordinates
-
 
 // ========================================================================
 // apply a kernel to xyzs, type family van
@@ -220,11 +263,34 @@ static float xyz_sum(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
+static float xyz_sum(vanflt *xi, vanflt *yi, vanflt *zi, vanidx *ix, size_t sz, kernel &wk)
+{
+  float total = 0.0;
+  while (sz--) {
+    vanidx i = *ix++;
+    total += wk.work(xi[i], yi[i], zi[i]).v;
+  }
+  return total;
+}
+
+template <class kernel>
 static float xyz_sum2(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 {
   float total = 0.0;
   while (sz--) {
     float v = wk.work(*xi++, *yi++, *zi++).v;
+    total += (v * v);
+  }
+  return total;
+}
+
+template <class kernel>
+static float xyz_sum2(vanflt *xi, vanflt *yi, vanflt *zi, vanidx *ix, size_t sz, kernel &wk)
+{
+  float total = 0.0;
+  while (sz--) {
+    vanidx i = *ix++;
+    float v = wk.work(xi[i], yi[i], zi[i]).v;
     total += (v * v);
   }
   return total;
@@ -240,11 +306,33 @@ static int xyz_any(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 }
 
 template <class kernel>
+static int xyz_any(vanflt *xi, vanflt *yi, vanflt *zi, vanidx *ix, size_t sz, kernel &wk)
+{
+  while (sz--) {
+    vanidx i = *ix++;
+    if (wk.work(xi[i], yi[i], zi[i]).v)
+      return 1;
+  }
+  return 0;
+}
+
+template <class kernel>
 static int xyz_all(vanflt *xi, vanflt *yi, vanflt *zi, size_t sz, kernel &wk)
 {
   while (sz--)
     if (!wk.work(*xi++, *yi++, *zi++).v)
       return 0;
+  return 1;
+}
+
+template <class kernel>
+static int xyz_all(vanflt *xi, vanflt *yi, vanflt *zi, vanidx *ix, size_t sz, kernel &wk)
+{
+  while (sz--) {
+    vanidx i = *ix++;
+    if (!wk.work(xi[i], yi[i], zi[i]).v)
+      return 0;
+  }
   return 1;
 }
 
@@ -259,12 +347,36 @@ static std::vector<size_t> xyz_pick(vanflt *xi, vanflt *yi, vanflt *zi, size_t s
 }
 
 template <class kernel>
+static std::vector<size_t> xyz_pick(vanflt *xi, vanflt *yi, vanflt *zi, vanidx *ix, size_t sz, kernel &wk)
+{
+  std::vector<size_t> r;
+  for (size_t i = 0; i < sz; i++) {
+    vanidx j = *ix++;
+    if (wk.work(xi[j], yi[j], zi[j]).v)
+      r.push_back(i);
+  }
+  return r;
+}
+
+template <class kernel>
 static void xyz_xyz(vanflt *xo, vanflt *yo, vanflt *zo,
              vanflt *xi, vanflt *yi, vanflt *zi,
              size_t sz, kernel &wk)
 {
   while (sz--)
     wk.work(*xo++, *yo++, *zo++, *xi++, *yi++, *zi++);
+}
+
+template <class kernel>
+static void xyz_xyz(vanflt *xo, vanflt *yo, vanflt *zo,
+             vanflt *xi, vanflt *yi, vanflt *zi,
+             vanidx *ix,
+             size_t sz, kernel &wk)
+{
+  while (sz--) {
+    vanidx i = *ix++;
+    wk.work(*xo++, *yo++, *zo++, xi[i], yi[i], zi[i]);
+  }
 }
 
 // ========================================================================
@@ -382,4 +494,96 @@ static void xyz_xyz(sseflt *xo, sseflt *yo, sseflt *zo,
   size_t fours = ((sz + 3) >> 2);
   while (fours--)
     wk.work(*xo++, *yo++, *zo++, *xi++, *yi++, *zi++);
+}
+
+// view versions
+
+template <class kernel>
+static float xyz_sum(sseflt *xi, sseflt *yi, sseflt *zi, sseidx *ix, size_t sz, kernel &wk)
+{
+  sseflt total(0.0), t(0.0);
+  size_t fours = ((sz + 3) >> 2);
+  while (fours--) {
+    sseidx i = *ix++;
+    total = total + t;
+    t = wk.work(access(xi, i), access(yi, i), access(zi, i));
+  }
+  total = total + (flt_masks[sz & 3] & t);
+  return total.sum();
+}
+
+// for a kernel that returns a scalar, return the sum of squares
+template <class kernel>
+static float xyz_sum2(sseflt *xi, sseflt *yi, sseflt *zi, sseidx *ix, size_t sz, kernel &wk)
+{
+  sseflt total(0.0), t(0.0);
+  size_t fours = ((sz + 3) >> 2);
+  while (fours--) {
+    sseidx i = *ix++;
+    total = total + (t * t);
+    t = wk.work(access(xi, i), access(yi, i), access(zi, i));
+  }
+  total = total + (flt_masks[sz & 3] & (t * t));
+  return total.sum();
+}
+
+template <class kernel>
+static int xyz_any(sseflt *xi, sseflt *yi, sseflt *zi, sseidx *ix, size_t sz, kernel &wk)
+{
+  ssebool t(0);
+  size_t fours = ((sz + 3) >> 2);
+  while (fours--) {
+    sseidx i = *ix++;
+    if (t.mask4() != 0)
+      return 1;
+    t = wk.work(access(xi, i), access(yi, i), access(zi, i));
+  }
+  return ((bool_masks[sz & 3] & t).mask4() != 0);
+}
+
+template <class kernel>
+static int xyz_all(sseflt *xi, sseflt *yi, sseflt *zi, sseidx *ix, size_t sz, kernel &wk)
+{
+  ssebool t(~0);
+  size_t fours = ((sz + 3) >> 2);
+  while (fours--) {
+    if (t.mask4() != 15)
+      return 0;
+    sseidx i = *ix++;
+    t = wk.work(access(xi, i), access(yi, i), access(zi, i));
+  }
+  ssebool mask = (bool_masks[sz & 3] ^ ssebool(~0));
+  return ((mask | t).mask4() == 15);
+}
+
+// for a kernel that returns a predicate, xyz_pick returns a vector of all the true indices
+
+template <class kernel>
+static std::vector<size_t> xyz_pick(sseflt *xi, sseflt *yi, sseflt *zi, sseidx *ix, size_t sz, kernel &wk)
+{
+  std::vector<size_t> r;
+  ssebool t(0);
+  size_t fours = ((sz + 3) >> 2);
+  size_t i = 0;
+  while (fours--) {
+    push4(r, i, t.mask4());
+    sseidx i = *ix++;
+    t = wk.work(access(xi, i), access(yi, i), access(zi, i));
+    i += 4;
+  }
+  ssebool mask = (bool_masks[sz & 3]);
+  push4(r, i, (mask & t).mask4());
+  return r;
+}
+
+template <class kernel>
+static void xyz_xyz(sseflt *xo, sseflt *yo, sseflt *zo,
+             sseflt *xi, sseflt *yi, sseflt *zi,
+             sseidx *ix, size_t sz, kernel &wk)
+{
+  size_t fours = ((sz + 3) >> 2);
+  while (fours--) {
+    sseidx i = *ix++;
+    wk.work(*xo++, *yo++, *zo++, access(xi, i), access(yi, i), access(zi, i));
+  }
 }

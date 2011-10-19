@@ -12,7 +12,7 @@ add_executable (test src/test.cpp src/cloud.cpp src/array.cpp src/float_array.cp
 
 target_link_libraries (test ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
-set(CMAKE_CXX_FLAGS "-msse3 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-msse4 ${CMAKE_CXX_FLAGS}")
 
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
