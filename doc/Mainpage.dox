@@ -1,0 +1,50 @@
+namespace pcl2
+{
+
+/**
+
+  \mainpage Point %Cloud Library 2.0
+
+  The <b>Point %Cloud Libary</b> is an awesome open source lirbary for 3-D point
+  cloud processing.  This paragraph says some introductory things about the
+  library and what it can be used for.
+
+  \section getting_started Getting started
+
+  One of the first steps in get started with the PCL 2.0 is to get familiar with
+  the basic data structures.  The first is the Cloud class.  This is one of the
+  most central data structures in PCL.  It is used to represent all of the 
+  various geometric, color, and feature data related to point cloud processing
+  Most of the high-level algorithms in PCL are designed to expect a Cloud as 
+  input and to return a Cloud as output. [<i>There is WAY more to say, but I'll
+  get to that later.  This is just a placeholder...</i>]
+
+  To provide a concrete example...
+  \code
+    // Think of lots of code examples...
+    using namespace pcl2;
+    Cloud cloud = loadCloud ("example.pcd");
+    FloatMatrix points = cloud["xyz"];
+  \endcode
+
+  Also, the Matrix class.  [<i>Say a bunch of stuff about Matrix and its 
+  subclasses.</i>]
+
+  \section faq Frequently Asked Questions
+
+  \li Q: Why isn't this page finished?
+  \li A: Because.
+
+  \li Q: How do I do something awesome with PCL?
+  \li A: Take a look at the following example:
+
+  \code
+    using namespace pcl2;
+    Cloud cloud = loadCloud ("example.pcd");
+    cloud += doSomethingAwesome (cloud);
+    saveCloud ("awesome_result.pcd", cloud);
+  \endcode
+  
+*/
+
+}
