@@ -9,7 +9,7 @@ pcl2::Cloud::Cloud () : size_ (0)
 
 }
 
-pcl2::Cloud::Cloud (const std::string & channel_name, Mat & channel_data) : size_ (channel_data.rows ())
+pcl2::Cloud::Cloud (const std::string & channel_name, Mat channel_data) : size_ (channel_data.rows ())
 {
   channels_.emplace (channel_name, channel_data);
 }

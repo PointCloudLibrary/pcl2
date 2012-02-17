@@ -5,6 +5,7 @@
 #include "pcl2/io/io.h"
 #include "pcl2/search/neighbors.h"
 #include "pcl2/registration/fit.h"
+#include "pcl2/create.h"
 
 int 
 main (int argc, char ** argv)

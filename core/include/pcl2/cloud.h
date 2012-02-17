@@ -74,7 +74,7 @@ class Cloud
      * \param channel_name The name of the channel (e.g., "xyz" for 3D points)
      * \param channel_data An n x m Mat representing a set of n m-dimensional points
      */
-    Cloud (const std::string & channel_name, Mat & channel_data);
+    Cloud (const std::string & channel_name, Mat channel_data);
   
 
     /** \brief Get the number of points in the cloud
