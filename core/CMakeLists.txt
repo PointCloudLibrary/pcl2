@@ -10,10 +10,13 @@ PCL_SUBSYS_DEPEND(build ${SUBSYS_NAME} DEPS ${SUBSYS_DEPS} EXT_DEPS eigen boost)
 
 if(build)
     set(srcs 
-        src/cloud.cpp 
+        src/cloud.cpp
         src/matrix.cpp
         src/eigen_matrix.cpp
-        src/conversions.cpp 
+        src/conversions.cpp
+	src/math.cpp
+	src/stats.cpp
+	#src/create.cpp
        )
 
     set(incs 
@@ -30,6 +33,9 @@ if(build)
         include/pcl2/row.h
         include/pcl2/typed_matrix.h
         include/pcl2/typed_matrix_impl.h
+	include/pcl2/math.h
+	include/pcl2/stats.h
+	include/pcl2/create.h
         )
         
     set(impl_incs 
@@ -38,6 +44,9 @@ if(build)
         include/pcl2/impl/matrix_row_impl.hpp
         include/pcl2/impl/matrix_view_impl.hpp
         include/pcl2/impl/typed_matrix.hpp
+	include/pcl2/impl/math.hpp
+	include/pcl2/impl/stats.hpp
+	#include/pcl2/impl/create.hpp
         )
 
     set(LIB_NAME pcl2_${SUBSYS_NAME})

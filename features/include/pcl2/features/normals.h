@@ -12,12 +12,12 @@
 namespace pcl2
 {
 
-Cloud estimateSurfaceNormals (Cloud cloud, float nhood_radius);
-Cloud estimateSurfaceNormals (MatF points, float nhood_radius);
+Cloud estimateSurfaceNormals (const Cloud & cloud, float nhood_radius);
+Cloud estimateSurfaceNormals (const MatF & points, float nhood_radius);
 
-Cloud estimateSurfaceNormals (MatF surface_points, MatF query_points, float nhood_radius);
+Cloud estimateSurfaceNormals (const MatF & surface_points, const MatF & query_points, float nhood_radius);
 
-Cloud estimateSurfaceNormalsKNN (Cloud cloud, int k);
+Cloud estimateSurfaceNormalsKNN (const Cloud & cloud, int k);
 
 // 
 // Cloud estimateSurfaceNormals (Cloud cloud, NeighborhoodSpec ns);

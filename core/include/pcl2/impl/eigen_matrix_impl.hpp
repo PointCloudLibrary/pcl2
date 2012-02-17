@@ -59,24 +59,16 @@ pcl2::core::EigenMatImpl<T>::cols () const
 
 template <typename T>
 void 
-pcl2::core::EigenMatImpl<T>::fill (const MatImpl::ConstPtr & matrix_ptr)
+pcl2::core::EigenMatImpl<T>::fill (const TypedMatImpl<T> & matrix)
 {
-  ///\todo Write this method!
-  assert (false);
-
   // Check to make sure the sizes are compatible
   /// \todo Replace these asserts with the appropriate if-statements and throws
-  assert (matrix_ptr->rows () == rows_);
-  assert (matrix_ptr->cols () == cols_);
+  assert (matrix.rows () == rows_);
+  assert (matrix.cols () == cols_);
 
-  // Cast the incoming pointer to a typed matrix
-  typedef core::TypedMatImpl<T> Impl;
-  typename Impl::ConstPtr typed_matrix_ptr = boost::dynamic_pointer_cast<const Impl> (matrix_ptr);
-  assert (typed_matrix_ptr);
-
-  for (int j = 0; j < cols_; ++j)
-    for (int i = 0; i < rows_; ++i)
-      data_ (i, j) = (*typed_matrix_ptr) (i,j);
+  for (size_t j = 0; j < cols_; ++j)
+    for (size_t i = 0; i < rows_; ++i)
+      data_ (i, j) = matrix (i, j);
 }
 
 template <typename T>
@@ -85,6 +77,112 @@ pcl2::core::EigenMatImpl<T>::fill (const T & value)
 {
   // Assign the given value to every element of the data matrix
   data_ = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>::Constant(rows_, cols_, value);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr 
+pcl2::core::EigenMatImpl<T>::operator + (const T & operand) const
+{
+  Ptr output (new EigenMatImpl<T> (rows (), cols ()));
+  output->data_ = data_.array () + operand;
+  return (output);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr 
+pcl2::core::EigenMatImpl<T>::operator - (const T & operand) const
+{
+  Ptr output (new EigenMatImpl<T> (rows (), cols ()));
+  output->data_ = data_.array () - operand;
+  return (output);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr 
+pcl2::core::EigenMatImpl<T>::operator * (const T & operand) const
+{
+  Ptr output (new EigenMatImpl<T> (rows (), cols ()));
+  output->data_ = data_ * operand;
+  return (output);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr 
+pcl2::core::EigenMatImpl<T>::operator / (const T & operand) const
+{
+  Ptr output (new EigenMatImpl<T> (rows (), cols ()));
+  output->data_ = data_ / operand;
+  return (output);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr 
+pcl2::core::EigenMatImpl<T>::operator + (const TypedMatImpl<T> & operand) const
+{
+  assert (operand.rows () == rows ());
+  assert (operand.cols () == cols ());
+  Ptr output (new EigenMatImpl<T> (rows (), cols ()));
+  for (size_t j = 0; j < cols (); ++j)
+    for (size_t i = 0; i < rows (); ++i)
+      output->data_ (i, j) = data_ (i, j) + operand (i, j);
+  return (output);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr 
+pcl2::core::EigenMatImpl<T>::operator - (const TypedMatImpl<T> & operand) const
+{
+  assert (operand.rows () == rows ());
+  assert (operand.cols () == cols ());
+  Ptr output (new EigenMatImpl<T> (rows (), cols ()));
+  for (size_t j = 0; j < cols (); ++j)
+    for (size_t i = 0; i < rows (); ++i)
+      output->data_ (i, j) = data_ (i, j) - operand (i, j);
+  return (output);
+}
+
+template <typename T>
+void 
+pcl2::core::EigenMatImpl<T>::operator += (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == rows ());
+  assert (operand.cols () == cols ());
+  for (size_t j = 0; j < cols (); ++j)
+    for (size_t i = 0; i < rows (); ++i)
+      data_ (i, j) += operand (i, j);
+}
+
+template <typename T>
+void 
+pcl2::core::EigenMatImpl<T>::operator -= (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == rows ());
+  assert (operand.cols () == cols ());
+  for (size_t j = 0; j < cols (); ++j)
+    for (size_t i = 0; i < rows (); ++i)
+      data_ (i, j) -= operand (i, j);
+}
+
+template <typename T>
+void 
+pcl2::core::EigenMatImpl<T>::operator *= (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == rows ());
+  assert (operand.cols () == cols ());
+  for (size_t j = 0; j < cols (); ++j)
+    for (size_t i = 0; i < rows (); ++i)
+      data_ (i, j) *= operand (i, j);
+}
+
+template <typename T>
+void 
+pcl2::core::EigenMatImpl<T>::operator /= (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == rows ());
+  assert (operand.cols () == cols ());
+  for (size_t j = 0; j < cols (); ++j)
+    for (size_t i = 0; i < rows (); ++i)
+      data_ (i, j) /= operand (i, j);
 }
 
 template <typename T>

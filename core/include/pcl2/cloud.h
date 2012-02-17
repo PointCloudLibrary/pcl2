@@ -136,7 +136,7 @@ class Cloud
      * \return A virtual subcloud representing only the points indexed by \a indices
      */
     Cloud 
-    operator () (const ConstTypedMat<int> & indices);
+    operator () (const TypedMat<int> & indices);
 
     /** \brief Determine if a channel is present in the cloud
      * 

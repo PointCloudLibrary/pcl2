@@ -19,7 +19,7 @@ namespace pcl2
  * \see ConstTypedMat Mat
  */
 template <typename T>
-class TypedMat : public Mat
+class TypedMat : public /*virtual*/ Mat//, public virtual ConstTypedMat<T>
 {
 public:
   typedef pcl2::Row<T> Row;
@@ -61,93 +61,155 @@ public:
    */
   const T & operator () (size_t i, size_t j) const;
 
+  /** \brief Access an element in the matrix
+   *
+   * \param i The index of the element in row-major order
+   * \return A const reference to the ith element
+   */
+  const T & operator [] (size_t i) const;
+
   Row operator () (size_t row_index);
+  const Row operator () (size_t row_index) const;
 
-  TypedMat operator () (const ConstTypedMat<int> & indices);
+  TypedMat operator () (const TypedMat<int> & indices);
 
-  /** Fill in this matrix with the provided scalar value
+  /** \brief Fill in this matrix with the provided scalar value
    * \param value The scalar value that will be copied into every element of this matrix
+   */
+  void fill (const T & value);
+
+  /** \brief Fill in this matrix with the provided values
+   * \param matrix The matrix whose values will be copied into the corresponding elements of this matrix
+   * The size of the input matrix (i.e., the source matrix) must be compatible with the
+   * matrix being filled (i.e., the destination).
    *
    * \throws IncompatibleSizeException
    */
-  void fill (const T & value);
+  void fill (const TypedMat<T> & matrix);
+
+  /** \todo Decide if the << operator is better than a "fill" method; we'll have both for now */
+  inline TypedMat<T> & operator << (const T & value) { fill (value); return (*this); }
+  inline TypedMat<T> & operator << (const TypedMat<T> & matrix) { fill (matrix); return (*this); }
+
+  /** \brief Perform scalar addition */
+  TypedMat
+  operator + (const T & operand) const;
+
+  /** \brief Perform scalar subtraction */
+  TypedMat
+  operator - (const T & operand) const;
+
+  /** \brief Perform scalar multiplication */
+  TypedMat
+  operator * (const T & operand) const;
+
+  /** \brief Perform scalar division */
+  TypedMat
+  operator / (const T & operand) const;
+
+  /** \brief Perform element-wise addition */
+  TypedMat
+  operator + (const TypedMat<T> & operand) const;
+
+  /** \brief Perform element-wise subtraction */
+  TypedMat
+  operator - (const TypedMat<T> & operand) const;
+
+  /** \brief Perform in-place element-wise addition */
+  TypedMat &
+  operator += (const TypedMat<T> & operand);
+
+  /** \brief Perform in-place element-wise subtraction */
+  TypedMat &
+  operator -= (const TypedMat<T> & operand);
+
+  /** \brief Perform in-place element-wise multiplication */
+  TypedMat &
+  operator *= (const TypedMat<T> & operand);
+
+  /** \brief Perform in-place element-wise division */
+  TypedMat &
+  operator /= (const TypedMat<T> & operand);
 
 protected:
   /** \brief A shared pointer to the matrix implementation */
   typename core::TypedMatImpl<T>::Ptr typed_matrix_ptr_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/** \brief A const version of TypedMat 
- *
- * \see TypedMat
- * \see Mat 
- */
-template <typename T>
-class ConstTypedMat : public Mat
-{
-public:
-  typedef pcl2::ConstRow<T> Row;
+// ///////////////////////////////////////////////////////////////////////////////
+// /** \brief A const version of TypedMat 
+//  *
+//  * \see TypedMat
+//  * \see Mat 
+//  */
+// template <typename T>
+// class ConstTypedMat : public Mat
+// {
+//   friend class TypedMat<T>;
 
-private:
-  ConstTypedMat ();
+// public:
+//   typedef pcl2::ConstRow<T> Row;
 
-protected:
-  /** \brief Construct a ConstTypedMat around the provided MatImpl 
-   *
-   * \throws Throws a BadCastException if the provided MatImpl cannot be cast 
-   * to a const matrix of the specified type, T.
-   * \todo Make this throw an exception instead of an assertion failure
-   */
-  ConstTypedMat (core::MatImpl::Ptr matrix);
+// private:
+//   ConstTypedMat ();
 
-public:
-  /** \brief Construct a ConstTypedMat from a generic Mat.  
-   *
-   * \throws Throws a BadCastException if the provided matrix cannot be cast to a
-   * const matrix of the specified type, T.
-   * \todo Make this throw an exception instead of an assertion failure
-   */
-  ConstTypedMat (const Mat & shared_matrix);
+// protected:
+//   /** \brief Construct a ConstTypedMat around the provided MatImpl 
+//    *
+//    * \throws Throws a BadCastException if the provided MatImpl cannot be cast 
+//    * to a const matrix of the specified type, T.
+//    * \todo Make this throw an exception instead of an assertion failure
+//    */
+//   ConstTypedMat (core::MatImpl::Ptr matrix);
 
-  /** \brief Access an element in the matrix
-   *
-   * \param i The row of the element
-   * \param j The column of the element
-   * \return A const reference to the element in the ith row and jth column
-   */
-  const T & operator () (size_t i, size_t j) const;
+// public:
+//   /** \brief Construct a ConstTypedMat from a generic Mat.  
+//    *
+//    * \throws Throws a BadCastException if the provided matrix cannot be cast to a
+//    * const matrix of the specified type, T.
+//    * \todo Make this throw an exception instead of an assertion failure
+//    */
+//   ConstTypedMat (const Mat & shared_matrix);
 
-  Row operator () (size_t row_index) const;
+//   /** \brief Access an element in the matrix
+//    *
+//    * \param i The row of the element
+//    * \param j The column of the element
+//    * \return A const reference to the element in the ith row and jth column
+//    */
+//   const T & operator () (size_t i, size_t j) const;
 
-  ConstTypedMat operator () (const ConstTypedMat<int> & indices);
+//   Row operator () (size_t row_index) const;
 
-protected:
-  /** A const shared pointer to the matrix implementation */
-  typename core::TypedMatImpl<T>::Ptr typed_matrix_ptr_;
-};
+//   ConstTypedMat operator () (const ConstTypedMat<int> & indices);
+
+// protected:
+//   /** A const shared pointer to the matrix implementation */
+//   typename core::TypedMatImpl<T>::Ptr typed_matrix_ptr_;
+// };
 
 typedef TypedMat<int> MatI;
-typedef ConstTypedMat<int> ConstMatI;
 typedef TypedMat<float> MatF;
-typedef ConstTypedMat<float> ConstMatF;
 typedef TypedMat<double> MatD;
-typedef ConstTypedMat<double> ConstMatD;
+//typedef ConstTypedMat<int> ConstMatI;
+//typedef ConstTypedMat<float> ConstMatF;
+//typedef ConstTypedMat<double> ConstMatD;
 
 template <typename T>
 std::ostream& operator << (std::ostream& out, const pcl2::TypedMat<T> & mat)
 {
-  const pcl2::ConstTypedMat<T> const_mat (mat);
-  return (out << const_mat);
-}
-
-template <typename T>
-std::ostream& operator << (std::ostream& out, const pcl2::ConstTypedMat<T> & mat)
-{
-  for (typename pcl2::ConstRow<T> r = mat (0); r.hasNext (); r.advance ())
+  for (typename pcl2::Row<T> r = mat (0); r.hasNext (); r.advance ())
     out << r << std::endl;
   return (out);
 }
+
+// template <typename T>
+// std::ostream& operator << (std::ostream& out, const pcl2::ConstTypedMat<T> & mat)
+// {
+//   for (typename pcl2::ConstRow<T> r = mat (0); r.hasNext (); r.advance ())
+//     out << r << std::endl;
+//   return (out);
+// }
 
 }
 

@@ -64,7 +64,7 @@ pcl2::Cloud::operator[] (const std::string & channel_name) const
 
 #include <iostream>
 pcl2::Cloud
-pcl2::Cloud::operator() (const ConstTypedMat<int> & indices)
+pcl2::Cloud::operator() (const TypedMat<int> & indices)
 {
   Cloud output;
   for (ChannelMap::iterator itr = channels_.begin (); itr != channels_.end (); ++itr)

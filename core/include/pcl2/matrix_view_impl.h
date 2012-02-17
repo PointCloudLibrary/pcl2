@@ -45,7 +45,7 @@ public:
    * \param matrix The source matrix (i.e., the matrix that is to be "viewed")
    * \param indices A matrix of integers indexing rows of the source \a matrix.
    */
-  MatViewImpl (typename TypedMatImpl<T>::Ptr matrix, TypedMatImpl<int>::ConstPtr indices);
+  MatViewImpl (typename TypedMatImpl<T>::Ptr matrix_ptr, TypedMatImpl<int>::ConstPtr indices_ptr);
 
   virtual MatImpl::Ptr copy () const;
 
@@ -55,18 +55,31 @@ public:
   virtual size_t rows () const;
   virtual size_t cols () const;
 
-  virtual void fill (const MatImpl::ConstPtr & matrix_ptr);
+  virtual void fill (const TypedMatImpl<T> & matrix);
   virtual void fill (const T & value);
+
+  virtual typename TypedMatImpl<T>::Ptr operator + (const T & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator - (const T & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator * (const T & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator / (const T & operand) const;
+
+  virtual typename TypedMatImpl<T>::Ptr operator + (const TypedMatImpl<T> & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator - (const TypedMatImpl<T> & operand) const;
+
+  virtual void operator += (const TypedMatImpl<T> & operand);
+  virtual void operator -= (const TypedMatImpl<T> & operand);
+  virtual void operator *= (const TypedMatImpl<T> & operand);
+  virtual void operator /= (const TypedMatImpl<T> & operand);
 
   virtual T & operator () (size_t i, size_t j);
   virtual const T & operator () (size_t i, size_t j) const;
 
 protected:
   /** The matrix being "viewed" */
-  typename TypedMatImpl<T>::Ptr matrix_;
+  typename TypedMatImpl<T>::Ptr matrix_ptr_;
 
   /** The list of indices into matrix_ that defines this view */
-  TypedMatImpl<int>::ConstPtr indices_;
+  TypedMatImpl<int>::ConstPtr indices_ptr_;
 
 };
 

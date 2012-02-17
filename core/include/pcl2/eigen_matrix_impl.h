@@ -71,8 +71,21 @@ public:
   virtual size_t rows () const;
   virtual size_t cols () const;
 
-  virtual void fill (const MatImpl::ConstPtr & matrix_ptr);
+  virtual void fill (const TypedMatImpl<T> & matrix_ptr);
   virtual void fill (const T & value);
+
+  virtual typename TypedMatImpl<T>::Ptr operator + (const T & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator - (const T & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator * (const T & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator / (const T & operand) const;
+
+  virtual typename TypedMatImpl<T>::Ptr operator + (const TypedMatImpl<T> & operand) const;
+  virtual typename TypedMatImpl<T>::Ptr operator - (const TypedMatImpl<T> & operand) const;
+
+  virtual void operator += (const TypedMatImpl<T> & operand);
+  virtual void operator -= (const TypedMatImpl<T> & operand);
+  virtual void operator *= (const TypedMatImpl<T> & operand);
+  virtual void operator /= (const TypedMatImpl<T> & operand);
 
   /** \brief Access an element in the matrix
    * \param i The row of the element

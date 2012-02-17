@@ -48,62 +48,64 @@ protected:
   friend class TypedMat<T>;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/** \brief A const version of Row 
- *
- * \see Row
- */
-template <typename T>
-class ConstRow : public ConstTypedMat<T>
-{
-  using Mat::matrix_ptr_;
+// ///////////////////////////////////////////////////////////////////////////////
+// /** \brief A const version of Row 
+//  *
+//  * \see Row
+//  */
+// template <typename T>
+// class ConstRow : public ConstTypedMat<T>
+// {
+//   using Mat::matrix_ptr_;
 
-private:
-  ConstRow () {};
+// private:
+//   ConstRow () {};
 
-public:
-  ConstRow (const Row<T> & row) : 
-    ConstTypedMat<T> (row)
-  {
-    mat_row_ptr_ = boost::dynamic_pointer_cast<core::MatRowImpl<T> > (matrix_ptr_);
-  }
+// public:
+//   ConstRow (const Row<T> & row) : 
+//     ConstTypedMat<T> (row)
+//   {
+//     mat_row_ptr_ = boost::dynamic_pointer_cast<core::MatRowImpl<T> > (matrix_ptr_);
+//   }
 
-protected:
-  /** \brief Construct a Row view into the provided TypedMatImpl
-   */
-  ConstRow (typename core::TypedMatImpl<T>::Ptr matrix_ptr, int row) :
-    ConstTypedMat<T> (typename core::MatRowImpl<T>::Ptr (new core::MatRowImpl<T> (matrix_ptr, row)))
-  {
-    mat_row_ptr_ = boost::dynamic_pointer_cast<core::MatRowImpl<T> > (matrix_ptr_);
-  }
+// protected:
+//   /** \brief Construct a Row view into the provided TypedMatImpl
+//    */
+//   ConstRow (typename core::TypedMatImpl<T>::Ptr matrix_ptr, int row) :
+//     ConstTypedMat<T> (typename core::MatRowImpl<T>::Ptr (new core::MatRowImpl<T> (matrix_ptr, row)))
+//   {
+//     mat_row_ptr_ = boost::dynamic_pointer_cast<core::MatRowImpl<T> > (matrix_ptr_);
+//   }
 
-public:
-  inline int getIndex () const { return (mat_row_ptr_->getIndex ()); }
-  inline bool hasNext () const { return (mat_row_ptr_->hasNext ()); }
-  inline void advance () { mat_row_ptr_->advance (); }
+// public:
+//   inline int getIndex () const { return (mat_row_ptr_->getIndex ()); }
+//   inline bool hasNext () const { return (mat_row_ptr_->hasNext ()); }
+//   inline void advance () { mat_row_ptr_->advance (); }
 
-protected:
+// protected:
 
-  typename core::MatRowImpl<T>::Ptr mat_row_ptr_;
+//   typename core::MatRowImpl<T>::Ptr mat_row_ptr_;
 
-  friend class ConstTypedMat<T>;
-};
-
-template <typename T>
-std::ostream& operator << (std::ostream& out, const pcl2::Row<T> row)
-{
-  const pcl2::ConstRow<T> const_row (row);
-  return (out << const_row);
-}
+//   friend class ConstTypedMat<T>;
+// };
 
 template <typename T>
-std::ostream& operator << (std::ostream& out, const pcl2::ConstRow<T> row)
+std::ostream& operator << (std::ostream& out, const pcl2::Row<T> & row)
 {
   for (size_t i = 0; i < row.cols (); ++i)
     out << row (0, i) << " ";
 
   return (out);
 }
+
+// template <typename T>
+// std::ostream& operator << (std::ostream& out, const pcl2::ConstRow<T> row)
+// {
+//   for (size_t i = 0; i < row.cols (); ++i)
+//     out << row (0, i) << " ";
+
+//   return (out);
+// }
 
 }
 

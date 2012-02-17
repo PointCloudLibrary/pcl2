@@ -16,12 +16,12 @@ namespace pcl2
 class Neighborhood : public Cloud
 {
 public:
-  Neighborhood (Cloud & cloud, const ConstTypedMat<int> & indices) : Cloud (cloud (indices)), indices_ (indices)
+  Neighborhood (Cloud & cloud, const TypedMat<int> & indices) : Cloud (cloud (indices)), indices_ (indices)
   {
 
   }
 protected:
-  ConstMatI indices_;
+  MatI indices_;
 };
 
 /** \brief Find the nearest neighbor to a query point in a given cloud 
@@ -30,7 +30,7 @@ protected:
  * \return The index of the nearest neighbor.
  * \see http://en.wikipedia.org/wiki/Nearest_neighbor_search#k-nearest_neighbor
  */
-int findKNearestNeighbor (Cloud cloud, MatF query);
+int findNearestNeighbor (const Cloud & cloud, const MatF & query);
 
 /** \brief Find the k nearest neighbors that surround a query point in a given cloud 
  * \param cloud An input cloud containing a 3D "xyz" channel
@@ -39,7 +39,7 @@ int findKNearestNeighbor (Cloud cloud, MatF query);
  * \return A MatI containing the indices of the k nearest neighbors.
  * \see http://en.wikipedia.org/wiki/Nearest_neighbor_search#k-nearest_neighbor
  */
-MatI findKNearestNeighbors (Cloud cloud, MatF query, size_t k);
+MatI findKNearestNeighbors (const Cloud & cloud, const MatF & query, size_t k);
 
 /** \brief Find all points within a specified radius surrounding a query point in a given cloud 
  * \param cloud An input cloud containing a 3D "xyz" channel
@@ -49,7 +49,7 @@ MatI findKNearestNeighbors (Cloud cloud, MatF query, size_t k);
  * \see http://en.wikipedia.org/wiki/Fixed-radius_near_neighbors
  * \see computeFixedRadiusNeighborhood
  */
-MatI findFixedRadiusNeighbors (Cloud cloud, MatF query, float r);
+MatI findFixedRadiusNeighbors (const Cloud & cloud, const MatF & query, float r);
 
 /** \brief Compute the subset points that fall within a specified radius surrounding a query point in a given cloud 
  * \param cloud An input cloud containing a 3D "xyz" channel
@@ -59,7 +59,7 @@ MatI findFixedRadiusNeighbors (Cloud cloud, MatF query, float r);
  * \see http://en.wikipedia.org/wiki/Fixed-radius_near_neighbors
  * \see findFixedRadiusNeighbors
  */
-Neighborhood computeFixedRadiusNeighborhood (Cloud cloud, MatF query, float r);
+Neighborhood computeFixedRadiusNeighborhood (Cloud & cloud, const MatF & query, float r);
 
 }
 

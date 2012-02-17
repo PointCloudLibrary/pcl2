@@ -33,7 +33,7 @@ void printChannelNames (const pcl2::Cloud & cloud)
 
 void print (const pcl2::Mat & matrix)
 {
-  pcl2::ConstMatF matf = matrix;
+  pcl2::MatF matf = matrix;
   for (size_t i = 0; i < matf.rows (); ++i)
   {
     cout << matf (i, 0);
@@ -45,7 +45,7 @@ void print (const pcl2::Mat & matrix)
 
 void printRow (const pcl2::Mat & matrix, size_t i)
 {
-  pcl2::ConstMatF matf = matrix;
+  pcl2::MatF matf = matrix;
   cout << matf (i, 0);
   for (size_t j = 1; j < matf.cols (); ++j)
     cout << ", " << matf (i, j);

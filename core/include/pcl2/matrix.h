@@ -10,7 +10,7 @@
 namespace pcl2
 {
 
-template <typename T> class ConstTypedMat;
+template <typename T> class TypedMat;
 
 /** \brief This class defines a shared 2D matrix object and serves as the core 
  * matrix data structure in PCL
@@ -50,7 +50,7 @@ protected:
    *
    * \return A shared pointer to the underlying Mat
    */
-  virtual core::MatImpl::ConstPtr getPtr () const;
+  virtual const core::MatImpl::Ptr getPtr () const;
 
 public:
   /** \brief Create a new copy of this matrix and its data
@@ -88,39 +88,14 @@ public:
    * the number of rows in \a indices and M is the number of columns in the
    * original matrix.
    */
-  Mat operator () (const ConstTypedMat<int> & indices);
-
-  /** \brief Fill in the values of this matrix using the values from the provided
-   * matrix
-   * \param matrix The matrix whose values will be copied into this matrix.
-   * The size of the input matrix (the source matrix) must be compatible with the
-   * matrix being filled (the destination).
-   *
-   * \todo Describe what we mean by "compatible".  Three cases: NxM into NxM, 
-   * 1xM into NxM (repeating rows), or Nx1 into NxM (repeating columns)
-   *
-   * \throws IncompatibleSizeException
-   */
-  void fill (const Mat & matrix);
-
-  /** \brief In-place matrix addition.
-   * \todo Write this documentation
-   * \throws IncompatibleSizeException
-   */
-  Mat & operator += (const Mat & matrix);
-
-  /** \brief In-place matrix multiplication.
-   * \todo Write this documentation
-   * \throws IncompatibleSizeException
-   */
-  Mat & operator *= (const Mat & matrix);
+  Mat operator () (const TypedMat<int> & indices);
 
 protected:
   /** A pointer to the underlying MatImpl containing the actual data */
   core::MatImpl::Ptr matrix_ptr_;
 
   template <typename T> friend class TypedMat;
-  template <typename T> friend class ConstTypedMat;
+  //template <typename T> friend class ConstTypedMat;
 
 };
 

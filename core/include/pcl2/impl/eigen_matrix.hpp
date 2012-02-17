@@ -33,7 +33,7 @@ pcl2::EigenMat<T>::EigenMat (size_t rows, size_t cols) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 template <typename T>
 pcl2::ConstEigenMat<T>::ConstEigenMat (core::MatImpl::Ptr matrix) : ConstTypedMat<T> (matrix)
 {
@@ -47,5 +47,5 @@ pcl2::ConstEigenMat<T>::ConstEigenMat (Mat & shared_matrix) : ConstTypedMat<T> (
   eigen_matrix_ptr_ = boost::dynamic_pointer_cast<const core::EigenMatImpl<T> > (matrix_ptr_);
   assert (eigen_matrix_ptr_);
 }
-
+*/
 #endif

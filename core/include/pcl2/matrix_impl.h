@@ -68,16 +68,6 @@ public:
    */
   virtual size_t cols () const = 0;
 
-  /** \brief Fill in the values of this matrix using the values from the provided
-   * matrix
-   * \param matrix The matrix whose values will be copied into this matrix.
-   * The size of the input matrix must be compatible with the matrix being filled.
-   *
-   * \throws IncompatibleSizeException
-   * \see Mat::fill (const Mat & matrix)
-   */
-  virtual void fill (const MatImpl::ConstPtr & matrix) = 0;
-
 };
 
 } // namespace core

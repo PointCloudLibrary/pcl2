@@ -9,7 +9,7 @@
 
 
 int
-pcl2::findKNearestNeighbor (Cloud cloud, MatF query)
+pcl2::findNearestNeighbor (const Cloud & cloud, const MatF & query)
 {
   // Convert point cloud
   MatF xyz = cloud["xyz"];
@@ -48,7 +48,7 @@ pcl2::findKNearestNeighbor (Cloud cloud, MatF query)
 }
 
 pcl2::TypedMat<int>
-pcl2::findKNearestNeighbors (Cloud cloud, MatF query, size_t k)
+pcl2::findKNearestNeighbors (const Cloud & cloud, const MatF & query, size_t k)
 {
   // Convert point cloud
   MatF xyz = cloud["xyz"];
@@ -92,7 +92,7 @@ pcl2::findKNearestNeighbors (Cloud cloud, MatF query, size_t k)
 }
 
 pcl2::TypedMat<int>
-pcl2::findFixedRadiusNeighbors (Cloud cloud, MatF query, float r)
+pcl2::findFixedRadiusNeighbors (const Cloud & cloud, const MatF & query, float r)
 {
   // Convert point cloud
   MatF xyz = cloud["xyz"];
@@ -137,7 +137,7 @@ pcl2::findFixedRadiusNeighbors (Cloud cloud, MatF query, float r)
 
 
 pcl2::Neighborhood
-pcl2::computeFixedRadiusNeighborhood (Cloud cloud, MatF query, float r)
+pcl2::computeFixedRadiusNeighborhood (Cloud & cloud, const MatF & query, float r)
 {
   // Convert point cloud
   MatF xyz = cloud["xyz"];

@@ -122,6 +122,7 @@ class NearestNeighborMatching : public CorrespondenceIdentification::Matching
     
     return (PointCorrespondences correspondences (source, target, indices));
     */
+    assert (false);
   }
 };
 

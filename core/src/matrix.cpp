@@ -16,7 +16,7 @@ pcl2::Mat::getPtr ()
   return (matrix_ptr_);
 }
 
-pcl2::core::MatImpl::ConstPtr 
+const pcl2::core::MatImpl::Ptr 
 pcl2::Mat::getPtr () const
 {
   return (matrix_ptr_);
@@ -41,30 +41,9 @@ pcl2::Mat::cols () const
 }
 
 pcl2::Mat
-pcl2::Mat::operator () (const ConstTypedMat<int> & indices)
+pcl2::Mat::operator () (const TypedMat<int> & indices)
 {
   typedef core::TypedMatImpl<int> Impl;
   Impl::ConstPtr idx = boost::dynamic_pointer_cast<const Impl> (indices.getPtr ());
   return (Mat (matrix_ptr_->createView (idx)));
-}
-
-void 
-pcl2::Mat::fill (const Mat & matrix)
-{
-  matrix_ptr_->fill (matrix.matrix_ptr_);
-}
-
-
-pcl2::Mat & 
-pcl2::Mat::operator += (const Mat & matrix)
-{
-  /// \todo Implement this operator!
-  assert (false);
-}
-
-pcl2::Mat &
-pcl2::Mat::operator *= (const Mat & matrix)
-{
-  /// \todo Implement this operator!
-  assert (false);
 }

@@ -56,42 +56,44 @@ protected:
   typename core::EigenMatImpl<T>::Ptr eigen_matrix_ptr_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/** \brief A const version of EigenMat 
- *
- * \see EigenMat
- * \see Mat 
- */
-template <typename T>
-class ConstEigenMat : public ConstTypedMat<T>
-{
-  using Mat::matrix_ptr_;
+// ///////////////////////////////////////////////////////////////////////////////
+// /** \brief A const version of EigenMat 
+//  *
+//  * \see EigenMat
+//  * \see Mat 
+//  */
+// template <typename T>
+// class ConstEigenMat : public ConstTypedMat<T>
+// {
+//   friend class EigenMat<T>;
 
-private:
-  ConstEigenMat ();
+//   using Mat::matrix_ptr_;
 
-protected:
-  /** \brief Construct a ConstEigenMat around the provided MatImpl 
-   *
-   * \throws Throws a BadCastException if the provided MatImpl cannot be cast 
-   * to a const EigenMatrixImpl.
-   * \todo Make this throw an exception instead of an assertion failure
-   */
-  ConstEigenMat (core::MatImpl::Ptr matrix);
+// private:
+//   ConstEigenMat ();
 
-public:
-  /** \brief Construct a ConstEigenMat from a generic Mat.  
-   *
-   * \throws Throws a BadCastException if the provided matrix cannot be cast to a
-   * const EigenMatrix.
-   * \todo Make this throw an exception instead of an assertion failure
-   */
-  ConstEigenMat (Mat & shared_matrix);
+// protected:
+//   /** \brief Construct a ConstEigenMat around the provided MatImpl 
+//    *
+//    * \throws Throws a BadCastException if the provided MatImpl cannot be cast 
+//    * to a const EigenMatrixImpl.
+//    * \todo Make this throw an exception instead of an assertion failure
+//    */
+//   ConstEigenMat (core::MatImpl::Ptr matrix);
 
-protected:
-  /** A const shared pointer to the matrix implementation */
-  typename core::EigenMatImpl<T>::ConstPtr eigen_matrix_ptr_;
-};
+// public:
+//   /** \brief Construct a ConstEigenMat from a generic Mat.  
+//    *
+//    * \throws Throws a BadCastException if the provided matrix cannot be cast to a
+//    * const EigenMatrix.
+//    * \todo Make this throw an exception instead of an assertion failure
+//    */
+//   ConstEigenMat (Mat & shared_matrix);
+
+// protected:
+//   /** A const shared pointer to the matrix implementation */
+//   typename core::EigenMatImpl<T>::ConstPtr eigen_matrix_ptr_;
+// };
 
 }
 

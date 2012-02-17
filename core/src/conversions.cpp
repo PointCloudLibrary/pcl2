@@ -101,7 +101,7 @@ pcl2::convertCloudToPointCloud2 (const pcl2::Cloud & input)
       offset += 4*field.count; // Warning: Assumes all channels are floats
     }
 
-    ConstMatF float_matrix = channel;
+    MatF float_matrix = channel;
     for (size_t r = 0; r < channel.rows (); ++r)
     {
       for (size_t c = 0; c < channel.cols (); ++c)

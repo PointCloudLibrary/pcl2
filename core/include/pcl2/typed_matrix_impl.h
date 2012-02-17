@@ -36,7 +36,8 @@ public:
    * \throws IncompatibleSizeException
    * \see Mat::fill (const Mat & matrix)
    */
-  virtual void fill (const MatImpl::ConstPtr & matrix_ptr) = 0; 
+  virtual void fill (const TypedMatImpl<T> & matrix) = 0; 
+
   virtual void fill (const T & value) = 0;
 
   /** \brief Access an element in the matrix
@@ -52,6 +53,30 @@ public:
    * \return A const reference to the element in the ith row and jth column
    */
   virtual const T & operator () (size_t i, size_t j) const = 0;
+
+  /** \brief Perform scalar addition */
+  virtual typename TypedMatImpl<T>::Ptr operator + (const T & operand) const = 0;
+  /** \brief Perform scalar subtraction */
+  virtual typename TypedMatImpl<T>::Ptr operator - (const T & operand) const = 0;
+  /** \brief Perform scalar multiplication */
+  virtual typename TypedMatImpl<T>::Ptr operator * (const T & operand) const = 0;
+  /** \brief Perform scalar division */
+  virtual typename TypedMatImpl<T>::Ptr operator / (const T & operand) const = 0;
+
+  /** \brief Perform element-wise addition */
+  virtual typename TypedMatImpl<T>::Ptr operator + (const TypedMatImpl<T> & operand) const = 0;
+  /** \brief Perform element-wise subtraction */
+  virtual typename TypedMatImpl<T>::Ptr operator - (const TypedMatImpl<T> & operand) const = 0;
+
+  /** \brief Perform in-place element-wise addition */
+  virtual void operator += (const TypedMatImpl<T> & operand) = 0;
+  /** \brief Perform in-place element-wise subtraction */
+  virtual void operator -= (const TypedMatImpl<T> & operand) = 0;
+  /** \brief Perform in-place element-wise multiplication */
+  virtual void operator *= (const TypedMatImpl<T> & operand) = 0;
+  /** \brief Perform in-place element-wise division */
+  virtual void operator /= (const TypedMatImpl<T> & operand) = 0;
+
 };
 
 } // namespace core

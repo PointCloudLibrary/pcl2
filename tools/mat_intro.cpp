@@ -2,27 +2,24 @@
 #include "pcl2/matrix.h"
 #include "pcl2/eigen_matrix.h"
 #include "pcl2/row.h"
+#include "pcl2/math.h"
+#include "pcl2/stats.h"
+#include "pcl2/io/io.h"
+#include "pcl2/search/neighbors.h"
+#include "pcl2/registration/fit.h"
+#include "pcl2/create.h"
 
-template <class MatT, typename ScalarT>
-MatT createRange (ScalarT start, ScalarT end, ScalarT step)
-{
-  int nr_elements = ceil(1.0*(end - start) / step);
-  MatT out (nr_elements, 1);
-
-  int i = 0;
-  for (ScalarT x = start; x < end; x += step)
-    out (i++, 0) = x;
-
-  return (out);
-}
-
-int
+int 
 main (int argc, char ** argv)
 {
   // Create an N by M matrix of floats
   int n = 8;
   int m = 3;
-  pcl2::EigenMat<float> mat (n, m);
+  pcl2::EigenMat<float> mat = pcl2::EigenMat<float> (n, m);
+
+  // By default, the values of a matrix are uninitialized
+  // We can change all the values in the array using 'fill' or the '<<' operator
+  mat << 10.0;
 
   // We can access its elements with the () operator 
   // (it's a matrix, so we follow mathematical convention: rows by columns)
@@ -31,32 +28,73 @@ main (int argc, char ** argv)
   std::cout << "The element stored at row " << i+1 << " and column " << j+1 << " is: ";
   std::cout << mat (i, j) << std::endl;
   
-  // As you likely guessed, we can change individual elements by assigning to the returned reference
-  mat (i, j) = 123;
-  std::cout << "After assignment, mat = " << std::endl << mat << std::endl;
-
-  // By default, the values of an EigenMat are initialized to zero. 
-  // We can change all the values in the array using 'fill'
-  mat.fill (1.0);
-  std::cout << "After fill, mat = " << std::endl << mat << std::endl;
-
   // We can also iterate over the rows and fill in each row individually
-  pcl2::ConstMatF foo = mat;
-  pcl2::ConstMatF::Row foo2 = mat (0);
-  for (pcl2::MatF::Row r = mat (0); r.hasNext (); r.advance ())
-  {
-    r.fill (100.0*r.getIndex ());
-  }
-  std::cout << "After row-by-row fill, mat = " << std::endl << mat << std::endl;
+  for (pcl2::MatF::Row row_i = mat (0); row_i.hasNext (); row_i.advance ())
+    row_i << row_i.getIndex () * 100;
 
-  pcl2::MatI idx = createRange<pcl2::EigenMat<int>, int> (0, n, 2); // What should this function really look like?
+  std::cout << "mat = " << std::endl 
+            << mat << std::endl << std::endl;
+  
+  // We can create special matrices using the functions declared in create.h
+  pcl2::MatF ones = pcl2::createOnes<float> (2, 3);
+  pcl2::MatF zeros = pcl2::createZeros<float> (1, 5);
+  pcl2::MatF eye = pcl2::createIdentity<float> (3);
+  pcl2::MatF rand = pcl2::createRandom<float> (2, 4);
+
+  std::cout << "ones = " << std::endl << ones << std::endl;
+  std::cout << "zeros = " << std::endl << zeros << std::endl;
+  std::cout << "eye = " << std::endl << eye << std::endl;
+  std::cout << "rand = " << std::endl << rand << std::endl;
+
+  // A "series" is a useful kind of matrix.  It creates a vector of sequential elements
+  // starting with a value, x0, and increasing in increments of d, up to---but not including-- the value, xN
+  //   S = [x0, x0+d, x0+2d, x0+3d, ..., xN)
+  pcl2::MatI idx = pcl2::createSeries (0, 8, 2); // will contain: 0, 2, 4, 6 (but not 8!)
+
   std::cout << "idx = " << std::endl << idx << std::endl;
+
+  // You can use a vector indices to create a "view" into another matrix.
+  // The view will contain a subset of the the original matrix's rows ---
+  // one for each element of the provided index vector of the original matrix.
+  // The view can be operated on just like any other matrix, 
+  // but changes to the view will affect the original
 
   pcl2::MatF view = mat (idx);
   std::cout << "view of mat [mat (idx)] = " << std::endl << view << std::endl;
-  view.fill (2);
+  view << pcl2::createRandom<float> (view.rows (), view.cols ());
 
-  std::cout << "After filling the view, mat = " << std::endl << mat << std::endl;
+  std::cout << "After filling the view with random values, view = " << std::endl
+            << view << std::endl << std::endl
+            << "and mat = " << std::endl 
+            << mat << std::endl << std::endl;
+
+  // Now we'll perform a few operations on matrices
+  std::cout << "The mean and covariance of mat: " << std::endl;
+  std::cout << pcl2::computeMean (mat) << std::endl;
+  std::cout << pcl2::computeCovariance (mat) << std::endl;
+
+  // This works on views, too
+  std::cout << pcl2::computeMean (mat (idx)) << std::endl;
+  std::cout << pcl2::computeCovariance (mat (idx)) << std::endl;
+
+  std::cout << "Cumulative sums and products:" << std::endl << std::endl;
+
+  mat << 10.0;
+  mat = pcl2::computeCumulativeSum (mat);
+  std::cout << mat << std::endl;
+
+  mat.fill (2.0);
+  std::cout << pcl2::computeCumulativeProduct (mat) << std::endl;
+
+  std::cout << "Outer sums and products:" << std::endl << std::endl;
+
+  mat << pcl2::computeOuterSum (pcl2::createSeries<float> (0, 80, 10), pcl2::createSeries<float> (0, 3));
+  std::cout << mat << std::endl << std::endl;
+
+  pcl2::MatF vec = pcl2::createSeries<float> (0.0, 3.0);
+  pcl2::MatF mat3x3 = pcl2::computeOuterProduct (vec, vec);
+  mat (pcl2::createSeries (3, 6)) << mat3x3;
+  std::cout << mat << std::endl << std::endl;
 
 
   return (0);

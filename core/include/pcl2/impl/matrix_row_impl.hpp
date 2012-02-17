@@ -24,10 +24,10 @@ pcl2::core::MatImpl::Ptr
 pcl2::core::MatRowImpl<T>::copy () const 
 {
   MatImpl::Ptr output_matrix_ptr = matrix_ptr_->createNew (1, cols ());
-  TypedMatImpl<T> & output_matrix_ref = *boost::dynamic_pointer_cast<TypedMatImpl<T> > (output_matrix_ptr);
+  TypedMatImpl<T> & output_matrix_ref = *boost::static_pointer_cast<TypedMatImpl<T> > (output_matrix_ptr);
   for (size_t i = 0; i < cols (); ++i)
   {
-    output_matrix_ref (row_index_, i) = (*matrix_ptr_) (row_index_, i);
+    output_matrix_ref (0, i) = (*matrix_ptr_) (row_index_, i);
   }
  
   return (output_matrix_ptr);
@@ -57,15 +57,13 @@ pcl2::core::MatRowImpl<T>::cols () const { return (matrix_ptr_->cols ()); }
 
 template <typename T>
 void
-pcl2::core::MatRowImpl<T>::fill (const MatImpl::ConstPtr & matrix_ptr)
+pcl2::core::MatRowImpl<T>::fill (const TypedMatImpl<T> & matrix)
 {
   ///\todo Replace this assert with a throw
-  assert (matrix_ptr->rows () == 1 && matrix_ptr->cols () == cols ()); 
-  typename TypedMatImpl<T>::ConstPtr typed_matrix_ptr = 
-    boost::dynamic_pointer_cast<const core::TypedMatImpl<T> > (matrix_ptr);
-  for (int i = 0; i < cols (); ++i)
+  assert (matrix.rows () == 1 && matrix.cols () == cols ()); 
+  for (size_t i = 0; i < cols (); ++i)
   {
-    (*matrix_ptr_) (row_index_, i) = (*typed_matrix_ptr) (0, i);
+    (*matrix_ptr_) (row_index_, i) = matrix (0, i);
   }
 }
 
@@ -73,9 +71,135 @@ template <typename T>
 void 
 pcl2::core::MatRowImpl<T>::fill (const T & value)
 {
-  for (int i = 0; i < cols (); ++i)
+  for (size_t i = 0; i < cols (); ++i)
   {
     (*matrix_ptr_) (row_index_, i) = value;
+  }
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr
+pcl2::core::MatRowImpl<T>::operator + (const T & operand) const
+{
+  typename TypedMatImpl<T>::Ptr output_matrix_ptr = 
+    boost::static_pointer_cast<core::TypedMatImpl<T> > (matrix_ptr_->createNew (1, cols ()));
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*output_matrix_ptr) (0, i) = (*matrix_ptr_) (row_index_, i) + operand;
+  }
+  return (output_matrix_ptr);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr
+pcl2::core::MatRowImpl<T>::operator - (const T & operand) const
+{
+  typename TypedMatImpl<T>::Ptr output_matrix_ptr = 
+    boost::static_pointer_cast<core::TypedMatImpl<T> > (matrix_ptr_->createNew (1, cols ()));
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*output_matrix_ptr) (0, i) = (*matrix_ptr_) (row_index_, i) - operand;
+  }
+  return (output_matrix_ptr);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr
+pcl2::core::MatRowImpl<T>::operator * (const T & operand) const
+{
+  typename TypedMatImpl<T>::Ptr output_matrix_ptr = 
+    boost::static_pointer_cast<core::TypedMatImpl<T> > (matrix_ptr_->createNew (1, cols ()));
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*output_matrix_ptr) (0, i) = (*matrix_ptr_) (row_index_, i) * operand;
+  }
+  return (output_matrix_ptr);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr
+pcl2::core::MatRowImpl<T>::operator / (const T & operand) const
+{
+  typename TypedMatImpl<T>::Ptr output_matrix_ptr = 
+    boost::static_pointer_cast<core::TypedMatImpl<T> > (matrix_ptr_->createNew (1, cols ()));
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*output_matrix_ptr) (0, i) = (*matrix_ptr_) (row_index_, i) / operand;
+  }
+  return (output_matrix_ptr);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr
+pcl2::core::MatRowImpl<T>::operator + (const TypedMatImpl<T> & operand) const
+{
+  typename TypedMatImpl<T>::Ptr output_matrix_ptr = 
+    boost::static_pointer_cast<core::TypedMatImpl<T> > (matrix_ptr_->createNew (1, cols ()));
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*output_matrix_ptr) (0, i) = (*matrix_ptr_) (row_index_, i) + operand (0, i);
+  }
+  return (output_matrix_ptr);
+}
+
+template <typename T>
+typename pcl2::core::TypedMatImpl<T>::Ptr
+pcl2::core::MatRowImpl<T>::operator - (const TypedMatImpl<T> & operand) const
+{
+  typename TypedMatImpl<T>::Ptr output_matrix_ptr = 
+    boost::static_pointer_cast<core::TypedMatImpl<T> > (matrix_ptr_->createNew (1, cols ()));
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*output_matrix_ptr) (0, i) = (*matrix_ptr_) (row_index_, i) - operand (0, i);
+  }
+  return (output_matrix_ptr);
+}
+
+template <typename T>
+void 
+pcl2::core::MatRowImpl<T>::operator += (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == 1);
+  assert (operand.cols () == cols ());
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*matrix_ptr_) (row_index_, i) += operand (0, i);
+  }
+}
+
+template <typename T>
+void 
+pcl2::core::MatRowImpl<T>::operator -= (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == 1);
+  assert (operand.cols () == cols ());
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*matrix_ptr_) (row_index_, i) -= operand (0, i);
+  }
+}
+
+template <typename T>
+void 
+pcl2::core::MatRowImpl<T>::operator *= (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == 1);
+  assert (operand.cols () == cols ());
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*matrix_ptr_) (row_index_, i) *= operand (0, i);
+  }
+}
+
+template <typename T>
+void 
+pcl2::core::MatRowImpl<T>::operator /= (const TypedMatImpl<T> & operand)
+{
+  assert (operand.rows () == 1);
+  assert (operand.cols () == cols ());
+  for (size_t i = 0; i < cols (); ++i)
+  {
+    (*matrix_ptr_) (row_index_, i) /= operand (0, i);
   }
 }
 
