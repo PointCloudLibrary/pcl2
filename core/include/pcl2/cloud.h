@@ -65,9 +65,17 @@ class Cloud
   public:
     /** \brief A shared pointer to a Cloud */
     typedef boost::shared_ptr<Cloud> Ptr;
-
+  
     /** \brief Construct an empty cloud */
     Cloud ();
+
+    /** \brief Construct a single-channel cloud 
+     *
+     * \param channel_name The name of the channel (e.g., "xyz" for 3D points)
+     * \param channel_data An n x m Mat representing a set of n m-dimensional points
+     */
+    Cloud (const std::string & channel_name, Mat & channel_data);
+  
 
     /** \brief Get the number of points in the cloud
      *

@@ -24,16 +24,16 @@ main (int argc, char ** argv)
   {
     // Find the neighbors
     const float radius = 0.03;
-    pcl2::TypedMat<int> nn_idx = pcl2::findFixedRadiusNeighbors (bunny, q, radius);
+    pcl2::MatI nn_idx = pcl2::findFixedRadiusNeighbors (bunny, q, radius);
 
     // Fit a plane to the neighborhood and store the result
     q_normal << pcl2::fitPlaneLLS (pts (nn_idx));
   }
 
   // Add the new normals channel to the cloud...
-  bunny.insert ("normals", normals);
+  bunny += pcl2::Cloud ("normals", normals);
   // ... and add a dummy curvature channel, too, because pcd_viewer expects one
-  bunny.insert ("curvature", pcl2::EigenMat<float> (bunny.size (), 1));
+  bunny += pcl2::Cloud ("curvature", pcl2::createZeros<float> (bunny.size (), 1));
 
   // Save the cloud for visualization 
   pcl2::saveCloud ("./bunny_out.pcd", bunny);

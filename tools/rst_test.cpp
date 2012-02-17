@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include "pcl2/matrix.h"
 #include "pcl2/eigen_matrix.h"
 #include "pcl2/row.h"
@@ -16,10 +17,8 @@
 class RSTWriter
 {
 public:
-  RSTWriter (const std::string filename) :
-    filename_ (filename),
-    codeblock_open_ (false)
-  {}
+  RSTWriter () : codeblock_open_ (false) {}
+
   void addRaw (const std::string & str)
   {
     strstream_ << str;
@@ -102,17 +101,19 @@ public:
     codeblock_open_ = false;
     // write the code block out to rst
     strstream_ << ".. literalinclude:: " << code_filename_ << std::endl
-               << "   :language: c++" << std::endl
+               << "   :language: cpp" << std::endl
                << "   :lines: " << code_start_ << " - " << code_end_ << std::endl 
                << std::endl;
   }
-  void write ()
+  void write (const std::string filename)
   {
-    std::cout << strstream_.str () << std::endl;
+    std::ofstream output_file;
+    output_file.open (filename.c_str ());
+    output_file << strstream_.str ();
+    output_file.close();
   }
 
 protected:
-  std::string filename_;
   std::stringstream strstream_;
   bool codeblock_open_;
   std::string code_filename_;
@@ -122,9 +123,12 @@ protected:
 int 
 main (int argc, char ** argv)
 {
-  RSTWriter rst ("foo");
-
+  RSTWriter rst;
+  
   rst.addTitle ("Example title");
+
+  rst.addText ("This is a simple example of how to write a tutorial in a single cpp file");
+
   rst.addSubtitle ("Example subtitle");
 
   rst.addText ("The following example shows how to create "
@@ -138,12 +142,18 @@ main (int argc, char ** argv)
   mat << pcl2::createRandom<float> (n, m);
   END_RST_CODEBLOCK(rst);
 
-  std::cout << mat << std::endl;
+  rst.addText ("The next line displays the matrix");
 
-  rst.addText ("This is what the output should look like:");
+  START_RST_CODEBLOCK(rst);
+  std::cout << mat << std::endl;
+  END_RST_CODEBLOCK(rst);
+
+  rst.addText ("and the output should look like this:");
   rst.addMat (mat);
 
+  rst.addText ("And if we wanted to display an image, we could.");
   rst.addImage ("./image.png");
 
-  rst.write ();
+  rst.write ("rst_test.rst");
+
 }
