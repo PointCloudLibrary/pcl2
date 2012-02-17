@@ -50,8 +50,31 @@ namespace pcl2
 template <typename T>
 class SpatialIndex
 {
-  virtual void setInput (const TypedMat<T> & input);
-  virtual MatI findKNearestNeighbors (size_t k);
+public:
+  typedef TypedMat<T> MatT;
+
+  virtual void setInput (const MatT & input);
+  virtual const MatT & getInput () const;
+  virtual MatI findKNearestNeighbors (size_t k) const;
+  virtual MatI findFixedRadiusNeighbors (float r) const;
+
+  virtual std::pair<MatI, MatT> findKNearestNeighborsAndDistances (size_t k) const;
+  virtual std::pair<MatI, MatT> findFixedRadiusNeighborsAndDistances (float r) const;
+};
+
+template <typename T>
+class KDTree : public SpatialIndex<T>
+{
+public:
+  using SpatialIndex<T>::MatT;
+
+  virtual void setInput (const MatT & input);
+  virtual const MatT & getInput () const;
+  virtual MatI findKNearestNeighbors (size_t k) const;
+  virtual MatI findFixedRadiusNeighbors (float r) const;
+
+  virtual std::pair<MatI, MatT> findKNearestNeighborsAndDistances (size_t k) const;
+  virtual std::pair<MatI, MatT> findFixedRadiusNeighborsAndDistances (float r) const;
 };
 
 }
