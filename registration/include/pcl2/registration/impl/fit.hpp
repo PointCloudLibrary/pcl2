@@ -25,7 +25,10 @@ pcl2::fitPlaneLLS (const TypedMat<T> & points)
   float curvature;
   pcl::computePointNormal (*point_cloud, plane_parameters, curvature);
   for (int i = 0; i < 3; ++i)
-    assert (fabs(normal (0, i) -plane_parameters (i)) < 1e-3);
+  {
+    assert (fabs(normal (0, i) - plane_parameters (i)) < 1e-3 ||
+            fabs(normal (0, i) + plane_parameters (i)) < 1e-3);
+  }
   //////
 
   return (normal);

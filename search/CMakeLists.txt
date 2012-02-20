@@ -15,6 +15,8 @@ if(build)
 
     set(incs 
         include/pcl2/search/neighbors.h
+        include/pcl2/search/spatial_index.h
+        include/pcl2/search/kdtree.h
         )
         
     set(impl_incs 

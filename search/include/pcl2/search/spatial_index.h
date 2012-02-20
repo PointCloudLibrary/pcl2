@@ -44,6 +44,8 @@
 
 // see http://en.wikipedia.org/wiki/Spatial_database#Spatial_Index
 
+#include "pcl2/typed_matrix.h"
+
 namespace pcl2
 {
 
@@ -53,28 +55,20 @@ class SpatialIndex
 public:
   typedef TypedMat<T> MatT;
 
-  virtual void setInput (const MatT & input);
-  virtual const MatT & getInput () const;
-  virtual MatI findKNearestNeighbors (size_t k) const;
-  virtual MatI findFixedRadiusNeighbors (float r) const;
+  virtual void
+  buildIndex (const MatT & input) = 0;
 
-  virtual std::pair<MatI, MatT> findKNearestNeighborsAndDistances (size_t k) const;
-  virtual std::pair<MatI, MatT> findFixedRadiusNeighborsAndDistances (float r) const;
-};
+  virtual MatI
+  findKNearestNeighbors (const MatT & query, size_t k) const = 0;
 
-template <typename T>
-class KDTree : public SpatialIndex<T>
-{
-public:
-  using SpatialIndex<T>::MatT;
+  virtual MatI
+  findFixedRadiusNeighbors (const MatT & query, float r) const = 0;
 
-  virtual void setInput (const MatT & input);
-  virtual const MatT & getInput () const;
-  virtual MatI findKNearestNeighbors (size_t k) const;
-  virtual MatI findFixedRadiusNeighbors (float r) const;
-
-  virtual std::pair<MatI, MatT> findKNearestNeighborsAndDistances (size_t k) const;
-  virtual std::pair<MatI, MatT> findFixedRadiusNeighborsAndDistances (float r) const;
+  virtual std::pair<MatI, MatT>
+  findKNearestNeighborsAndDistances (const MatT & query, size_t k) const = 0;
+  
+  virtual std::pair<MatI, MatT>
+  findFixedRadiusNeighborsAndDistances (const MatT & query, float r) const = 0;
 };
 
 }
