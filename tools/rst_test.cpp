@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 #include "pcl2/matrix.h"
 #include "pcl2/eigen_matrix.h"
 #include "pcl2/row.h"
@@ -12,7 +13,7 @@
 #include "pcl2/create.h"
 
 #define START_RST_CODEBLOCK(rst) rst.openCodeblock(__FILE__, __LINE__+1);
-#define END_RST_CODEBLOCK(rst) rst.closeCodeblock(__LINE__-1);
+#define END_RST_CODEBLOCK(rst) rst.closeCodeblock(__LINE__-1); 
 
 class RSTWriter
 {

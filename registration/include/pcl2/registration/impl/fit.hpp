@@ -3,11 +3,13 @@
  */
 
 #include "pcl2/registration/fit.h"
+
+#include "pcl2/core.h"
 #include "pcl2/eigen_matrix.h"
-#include "pcl2/conversions.h"
 #include "pcl2/stats.h"
 #include "pcl2/math.h"
 
+#include "pcl2/conversions.h"
 #include <pcl/features/normal_3d.h>
 
 template <typename T>
@@ -39,6 +41,6 @@ template <typename T>
 pcl2::TypedMat<T>
 pcl2::fitPlaneRANSAC (const TypedMat<T> & points, float inlier_threshold)
 {
-  #define SORRY_NOT_IMPLEMENTED_YET false
+  const bool SORRY_NOT_IMPLEMENTED_YET = false;
   assert (SORRY_NOT_IMPLEMENTED_YET);
 }

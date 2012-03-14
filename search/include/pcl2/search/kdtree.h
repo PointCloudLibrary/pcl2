@@ -43,10 +43,14 @@
 #define PCL2_KDTREE_H
 
 
-#include "pcl2/search/spatial_index.h"
+#include "pcl2/spatial_index.h"
+
 #include <pcl/kdtree/kdtree_flann.h>
 
 namespace pcl2
+{
+
+namespace search
 {
 
 template <typename T>
@@ -138,6 +142,8 @@ public:
 protected:
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree_;
 };
+
+}
 
 }
 

@@ -5,8 +5,10 @@
 #ifndef PCL2_MATRIX_ROW_IMPL_H
 #define PCL2_MATRIX_ROW_IMPL_H
 
-#include <assert.h>
 #include "typed_matrix_impl.h"
+
+#include <assert.h>
+#include <boost/enable_shared_from_this.hpp>
 
 namespace pcl2
 {

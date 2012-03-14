@@ -32,20 +32,4 @@ pcl2::EigenMat<T>::EigenMat (size_t rows, size_t cols) :
   assert (eigen_matrix_ptr_);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-template <typename T>
-pcl2::ConstEigenMat<T>::ConstEigenMat (core::MatImpl::Ptr matrix) : ConstTypedMat<T> (matrix)
-{
-  eigen_matrix_ptr_ = boost::dynamic_pointer_cast<const core::EigenMatImpl<T> > (matrix);
-  assert (eigen_matrix_ptr_);
-}
-
-template <typename T>
-pcl2::ConstEigenMat<T>::ConstEigenMat (Mat & shared_matrix) : ConstTypedMat<T> (shared_matrix)
-{
-  eigen_matrix_ptr_ = boost::dynamic_pointer_cast<const core::EigenMatImpl<T> > (matrix_ptr_);
-  assert (eigen_matrix_ptr_);
-}
-*/
 #endif

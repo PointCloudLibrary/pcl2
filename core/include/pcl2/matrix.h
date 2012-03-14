@@ -5,10 +5,16 @@
 #ifndef PCL2_MATRIX_H
 #define PCL2_MATRIX_H
 
-#include "pcl2/matrix_impl.h"
+#include <boost/shared_ptr.hpp>
 
 namespace pcl2
 {
+
+// Forward declarations
+namespace core
+{
+class MatImpl;
+}
 
 template <typename T> class TypedMat;
 
@@ -37,20 +43,23 @@ private:
   Mat ();
 
 protected:
+  /** \brief A shared pointer to the implementation */
+  typedef boost::shared_ptr<core::MatImpl> MatImplPtr;
+
   /** \brief Construct a Mat around the provided MatImpl */
-  Mat (const core::MatImpl::Ptr matrix_ptr);
+  Mat (const MatImplPtr matrix_ptr);
 
   /** \brief Get the shared pointer to the underlying MatImpl
    *
    * \return A shared pointer to the underlying MatImpl
    */
-  virtual core::MatImpl::Ptr getPtr ();
+  virtual MatImplPtr getPtr ();
 
   /** \brief Get a const shared pointer to the underlying Mat
    *
    * \return A shared pointer to the underlying Mat
    */
-  virtual const core::MatImpl::Ptr getPtr () const;
+  virtual const MatImplPtr getPtr () const;
 
 public:
   /** \brief Create a new copy of this matrix and its data
@@ -92,10 +101,9 @@ public:
 
 protected:
   /** A pointer to the underlying MatImpl containing the actual data */
-  core::MatImpl::Ptr matrix_ptr_;
+  boost::shared_ptr<core::MatImpl> matrix_ptr_;
 
   template <typename T> friend class TypedMat;
-  //template <typename T> friend class ConstTypedMat;
 
 };
 

@@ -8,6 +8,8 @@
 #include "pcl2/cloud.h"
 #include "pcl2/typed_matrix.h"
 
+#include <assert.h>
+
 namespace pcl2
 {
 

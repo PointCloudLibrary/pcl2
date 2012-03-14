@@ -6,7 +6,11 @@
 #define PCL2_TYPED_MATRIX_HPP
 
 #include "pcl2/typed_matrix.h"
-#include "pcl2/impl/matrix_row_impl.hpp"
+#include "pcl2/typed_matrix_impl.h"
+#include "pcl2/row.h"
+#include "pcl2/spatial_index.h"
+
+#include <assert.h>
 
 template <typename T>
 pcl2::TypedMat<T>::TypedMat (core::MatImpl::Ptr matrix) : Mat (matrix)
@@ -174,43 +178,30 @@ pcl2::TypedMat<T>::operator /= (const TypedMat<T> & operand)
   return (*this);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
 template <typename T>
-pcl2::ConstTypedMat<T>::ConstTypedMat (core::MatImpl::Ptr matrix) : Mat (matrix)
+void
+pcl2::TypedMat<T>::buildSpatialIndex (const boost::shared_ptr<SpatialIndex<T> > & spatial_index) const
 {
-  typed_matrix_ptr_ = boost::dynamic_pointer_cast<core::TypedMatImpl<T> > (matrix);
-  assert (typed_matrix_ptr_);
+  typed_matrix_ptr_->spatial_index_ = spatial_index;
+  typed_matrix_ptr_->spatial_index_->buildIndex (*this);
 }
 
 template <typename T>
-pcl2::ConstTypedMat<T>::ConstTypedMat (const Mat & shared_matrix) : Mat (shared_matrix)
+boost::shared_ptr<pcl2::SpatialIndex<T> >
+pcl2::TypedMat<T>::getSpatialIndex () const
 {
-  typed_matrix_ptr_ = boost::dynamic_pointer_cast<core::TypedMatImpl<T> > (matrix_ptr_);
-  assert (typed_matrix_ptr_);
+  return (typed_matrix_ptr_->spatial_index_);
 }
 
-template <typename T>
-const T & 
-pcl2::ConstTypedMat<T>::operator () (size_t i, size_t j) const
-{
-  return ((*typed_matrix_ptr_) (i, j));
-}
 
 template <typename T>
-pcl2::ConstRow<T>
-pcl2::ConstTypedMat<T>::operator () (size_t index) const
+std::ostream&
+pcl2::operator << (std::ostream& out, const pcl2::TypedMat<T> & mat)
 {
-  return (Row (typed_matrix_ptr_, index));
+  for (typename pcl2::Row<T> r = mat (0); r.hasNext (); r.advance ())
+    out << r << std::endl;
+  return (out);
 }
 
-template <typename T>
-pcl2::ConstTypedMat<T>
-pcl2::ConstTypedMat<T>::operator () (const ConstTypedMat<int> & indices)
-{
-  typedef core::TypedMatImpl<int> Impl;
-  Impl::ConstPtr idx = boost::dynamic_pointer_cast<const Impl> (indices.getPtr ());
-  return (ConstTypedMat (matrix_ptr_->createView (idx)));
-}
-*/
+
 #endif

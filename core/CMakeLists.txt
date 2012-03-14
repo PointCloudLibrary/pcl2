@@ -12,6 +12,7 @@ if(build)
     set(srcs 
         src/cloud.cpp
         src/matrix.cpp
+	src/row.cpp
         src/eigen_matrix.cpp
         src/conversions.cpp
 	src/math.cpp
@@ -22,30 +23,33 @@ if(build)
     set(incs 
         include/pcl2/cloud.h
         include/pcl2/conversions.h
+	include/pcl2/core.h
+	include/pcl2/create.h
         include/pcl2/eigen_matrix.h
         include/pcl2/eigen_matrix_impl.h
         include/pcl2/exception.h
         include/pcl2/kernels.h
+	include/pcl2/math.h
         include/pcl2/matrix.h
         include/pcl2/matrix_impl.h
         include/pcl2/matrix_row_impl.h
         include/pcl2/matrix_view_impl.h
         include/pcl2/row.h
+	include/pcl2/spatial_index.h
+	include/pcl2/stats.h
         include/pcl2/typed_matrix.h
         include/pcl2/typed_matrix_impl.h
-	include/pcl2/math.h
-	include/pcl2/stats.h
-	include/pcl2/create.h
         )
         
     set(impl_incs 
         include/pcl2/impl/eigen_matrix.hpp
         include/pcl2/impl/eigen_matrix_impl.hpp
+	include/pcl2/impl/math.hpp
         include/pcl2/impl/matrix_row_impl.hpp
         include/pcl2/impl/matrix_view_impl.hpp
-        include/pcl2/impl/typed_matrix.hpp
-	include/pcl2/impl/math.hpp
+	include/pcl2/impl/row.hpp
 	include/pcl2/impl/stats.hpp
+        include/pcl2/impl/typed_matrix.hpp
 	#include/pcl2/impl/create.hpp
         )
 

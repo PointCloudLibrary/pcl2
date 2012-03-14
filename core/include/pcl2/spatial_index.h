@@ -45,6 +45,7 @@
 // see http://en.wikipedia.org/wiki/Spatial_database#Spatial_Index
 
 #include "pcl2/typed_matrix.h"
+#include <boost/shared_ptr.hpp>
 
 namespace pcl2
 {
@@ -54,6 +55,7 @@ class SpatialIndex
 {
 public:
   typedef TypedMat<T> MatT;
+  typedef boost::shared_ptr<pcl2::SpatialIndex<T> > Ptr;
 
   virtual void
   buildIndex (const MatT & input) = 0;

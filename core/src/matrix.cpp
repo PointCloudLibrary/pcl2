@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include "pcl2/matrix.h"
+#include "pcl2/matrix_impl.h"
 #include "pcl2/typed_matrix.h"
 
 #include "pcl2/matrix_view_impl.h"

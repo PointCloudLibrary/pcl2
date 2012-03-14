@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 #include "pcl2/cloud.h"
 #include "pcl2/matrix.h"
 #include "pcl2/eigen_matrix.h"

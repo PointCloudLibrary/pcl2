@@ -1,7 +1,7 @@
 #include <iostream>
-#include "pcl2/typed_matrix.h"
+#include "pcl2/core.h"
 #include "pcl2/eigen_matrix.h"
-#include "pcl2/row.h"
+
 #include "pcl2/io/io.h"
 #include "pcl2/search/neighbors.h"
 #include "pcl2/registration/fit.h"
@@ -21,9 +21,9 @@ main (int argc, char ** argv)
   // Create a new mat to store the surface normals in
   pcl2::EigenMat<float> normals (bunny.size (), 3);
 
-  // Build a spatial search index (this will be automated soon)
-  pcl2::KDTree<float> tree;
-  tree.buildIndex (pts);
+  //// Build a spatial search index (this will be automated soon)
+  //pcl2::search::KDTree<float> tree;
+  //tree.buildIndex (pts);
 
   // Loop over every point in the cloud
   pcl2::MatF::Row q_normal = normals (0);
@@ -31,8 +31,8 @@ main (int argc, char ** argv)
   {
     // Find the neighbors
     const float radius = 0.03;
-    //pcl2::MatI nn_idx = pcl2::findFixedRadiusNeighbors (bunny, q, radius);
-    pcl2::MatI nn_idx = tree.findFixedRadiusNeighbors (q, radius);
+    pcl2::MatI nn_idx = pcl2::findFixedRadiusNeighbors (bunny, q, radius);
+    //pcl2::MatI nn_idx = tree.findFixedRadiusNeighbors (q, radius);
 
     // Fit a plane to the neighborhood and store the result
     q_normal << pcl2::fitPlaneLLS (pts (nn_idx));

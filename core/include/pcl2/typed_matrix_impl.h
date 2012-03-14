@@ -5,10 +5,14 @@
 #ifndef PCL2_TYPED_MATRIX_IMPL_H
 #define PCL2_TYPED_MATRIX_IMPL_H
 #include <iostream>
-#include "matrix_impl.h"
+#include "pcl2/matrix_impl.h"
+#include "pcl2/spatial_index.h"
 
 namespace pcl2
 {
+
+template <typename T> class SpatialIndex;
+
 namespace core
 {
 
@@ -21,6 +25,7 @@ namespace core
 template <typename T>
 class TypedMatImpl : public MatImpl
 {
+
 public:
   /** \brief A shared pointer to a TypedMatImpl */
   typedef boost::shared_ptr<TypedMatImpl<T> > Ptr;
@@ -77,6 +82,7 @@ public:
   /** \brief Perform in-place element-wise division */
   virtual void operator /= (const TypedMatImpl<T> & operand) = 0;
 
+  mutable typename SpatialIndex<T>::Ptr spatial_index_;
 };
 
 } // namespace core

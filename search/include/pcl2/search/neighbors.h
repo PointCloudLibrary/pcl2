@@ -49,7 +49,7 @@ MatI findKNearestNeighbors (const Cloud & cloud, const MatF & query, size_t k);
  * \see http://en.wikipedia.org/wiki/Fixed-radius_near_neighbors
  * \see computeFixedRadiusNeighborhood
  */
-MatI findFixedRadiusNeighbors (const Cloud & cloud, const MatF & query, float r);
+MatI findFixedRadiusNeighbors (Cloud & cloud, const MatF & query, float r);
 
 /** \brief Compute the subset points that fall within a specified radius surrounding a query point in a given cloud 
  * \param cloud An input cloud containing a 3D "xyz" channel

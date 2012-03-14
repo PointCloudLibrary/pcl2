@@ -6,10 +6,14 @@
 #define PCL2_EIGEN_MATRIX_H
 
 #include "pcl2/typed_matrix.h"
-#include "pcl2/eigen_matrix_impl.h"
 
 namespace pcl2
 {
+
+namespace core
+{
+  template <typename T> class EigenMatImpl;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /** \brief A shared wrapper of an Eigen matrix
@@ -21,19 +25,23 @@ namespace pcl2
 template <typename T>
 class EigenMat : public TypedMat<T>
 {
-  using Mat::matrix_ptr_;
+protected:
+  using TypedMat<T>::matrix_ptr_;
 
 private:
   EigenMat ();
 
 protected:
+  /** \brief A shared pointer to the implementation */
+  typedef boost::shared_ptr<core::MatImpl> MatImplPtr;
+
   /** \brief Construct a EigenMat around the provided MatImpl 
    *
    * \throws Throws a BadCastException if the provided MatImpl cannot be cast 
    * to an EigenMatrixImpl.
    * \todo Make this throw an exception instead of an assertion failure
    */
-  EigenMat (core::MatImpl::Ptr matrix);
+  EigenMat (MatImplPtr matrix);
 
 public:
   /** \brief Construct a EigenMat from a generic Mat.  
@@ -53,47 +61,8 @@ public:
 
 protected:
   /** \brief A shared pointer to the matrix implementation */
-  typename core::EigenMatImpl<T>::Ptr eigen_matrix_ptr_;
+  boost::shared_ptr<core::EigenMatImpl<T> > eigen_matrix_ptr_;
 };
-
-// ///////////////////////////////////////////////////////////////////////////////
-// /** \brief A const version of EigenMat 
-//  *
-//  * \see EigenMat
-//  * \see Mat 
-//  */
-// template <typename T>
-// class ConstEigenMat : public ConstTypedMat<T>
-// {
-//   friend class EigenMat<T>;
-
-//   using Mat::matrix_ptr_;
-
-// private:
-//   ConstEigenMat ();
-
-// protected:
-//   /** \brief Construct a ConstEigenMat around the provided MatImpl 
-//    *
-//    * \throws Throws a BadCastException if the provided MatImpl cannot be cast 
-//    * to a const EigenMatrixImpl.
-//    * \todo Make this throw an exception instead of an assertion failure
-//    */
-//   ConstEigenMat (core::MatImpl::Ptr matrix);
-
-// public:
-//   /** \brief Construct a ConstEigenMat from a generic Mat.  
-//    *
-//    * \throws Throws a BadCastException if the provided matrix cannot be cast to a
-//    * const EigenMatrix.
-//    * \todo Make this throw an exception instead of an assertion failure
-//    */
-//   ConstEigenMat (Mat & shared_matrix);
-
-// protected:
-//   /** A const shared pointer to the matrix implementation */
-//   typename core::EigenMatImpl<T>::ConstPtr eigen_matrix_ptr_;
-// };
 
 }
 
