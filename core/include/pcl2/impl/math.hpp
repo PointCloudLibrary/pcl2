@@ -42,8 +42,8 @@
 #include "pcl2/math.h"
 #include "pcl2/row.h"
 #include "pcl2/eigen_matrix.h"
-
-#include <pcl/common/eigen.h> /// \attention Using PCL 1
+#include "pcl2/eigen_math.h"
+//#include <pcl/common/eigen.h> /// \attention Using PCL 1
 
 template<typename T>
 pcl2::TypedMat<T>
@@ -159,7 +159,7 @@ pcl2::computeEigenvalues3x3 (const TypedMat<T> & input)
   // Compute the eigenvalues
   Eigen::Matrix<T, 1, 3> eigenvalues;
   Eigen::Matrix<T, 3, 3> eigenvectors;
-  pcl::eigen33 (matrix, eigenvectors, eigenvalues);
+  eigen33 (matrix, eigenvectors, eigenvalues);
 
   // Copy the eigenvalues into the output matrix
   TypedMat<T> output = input (0).copy (); /// \todo, come up with a way to create new TypedMat<T>s 
@@ -184,7 +184,7 @@ pcl2::computeEigenvectors3x3 (const TypedMat<T> & input)
   // Compute the eigenvalues
   Eigen::Matrix<T, 1, 3> eigenvalues;
   Eigen::Matrix<T, 3, 3> eigenvectors;
-  pcl::eigen33 (matrix, eigenvectors, eigenvalues);
+  eigen33 (matrix, eigenvectors, eigenvalues);
 
   // Copy the eigenvectors into the output matrix
   TypedMat<T> output = input.copy (); /// \todo, come up with a way to create new TypedMat<T>s 
@@ -209,7 +209,7 @@ pcl2::computeEigendecomposition3x3 (const TypedMat<T> & input, TypedMat<T> & eig
   // Compute the eigenvalues
   Eigen::Matrix<T, 1, 3> eigen_eigenvalues;
   Eigen::Matrix<T, 3, 3> eigen_eigenvectors;
-  pcl::eigen33 (matrix, eigen_eigenvectors, eigen_eigenvalues);
+  eigen33 (matrix, eigen_eigenvectors, eigen_eigenvalues);
 
   // Copy the eigenvectors into the output matrix
   Eigen::Map<Eigen::Matrix<T, 1, 3> > eigenvalues_map (&eigenvalues (0, 0));
