@@ -1,7 +1,9 @@
 # Options for building PCL.
 
 # Build shared libraries by default.
-option(PCL_SHARED_LIBS "Build shared libraries." ON)
+cmake_dependent_option(PCL_SHARED_LIBS
+  "Build shared libraries." ON "NOT ANDROID_NDK" OFF)
+
 if(PCL_SHARED_LIBS)
   set(PCL_LIB_PREFIX ${CMAKE_SHARED_LIBRARY_PREFIX})
   set(PCL_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
